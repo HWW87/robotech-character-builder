@@ -1,0 +1,311 @@
+{
+  "schema_version": "1.0",
+  "game": "Robotech RPG (Palladium)",
+  "source": {
+    "title": "Robotech - Book 01 - Main",
+    "section": "Human O.C.C."
+  },
+  "enums": {
+    "skill_rule_type": ["BONUS_PERCENT", "BASE_PLUS_PER_LEVEL", "CHOICE", "TEXT_ONLY"],
+    "skill_category": [
+      "Communications",
+      "Domestic",
+      "Electrical",
+      "Espionage",
+      "Mechanical",
+      "Medical",
+      "Physical",
+      "Pilot",
+      "Pilot Related",
+      "Science",
+      "Technology",
+      "Technical",
+      "W.P."
+    ]
+  },
+  "occs": [
+    {
+      "id": "occ_destroid_pilot",
+      "factions": ["RDF"],
+      "name_en": "Destroid Pilot",
+      "name_es": "Piloto de Destroid",
+      "attribute_requirements": {
+        "minimums": { "IQ": 6 },
+        "preferred": ["High P.P."],
+        "notes": "high P.P. preferred, not required"
+      },
+      "description_es": "Piloto especializado en Destroids (mechas no transformables). Entrenado formalmente para operar todos los Destroids y combate en dos modelos específicos (elige dos). Puede sumar más Mecha Combat como 'other skills' sin límite.",
+      "occ_skills": [
+        { "skill": "Pilot Automobile", "rule_type": "BONUS_PERCENT", "bonus": 10 },
+        { "skill": "Pilot Mecha (all Destroids)", "rule_type": "BONUS_PERCENT", "bonus": 20 },
+        { "skill": "Mecha Combat (choose two)", "rule_type": "CHOICE", "choices": 2, "notes": "choose two specific models for combat training" },
+        { "skill": "Weapon Systems", "rule_type": "BONUS_PERCENT", "bonus": 15 },
+        { "skill": "Hand to Hand: Basic", "rule_type": "TEXT_ONLY" },
+        { "skill": "W.P. Semi & Fully Automatic Rifle", "rule_type": "TEXT_ONLY" }
+      ],
+      "other_skills": {
+        "select_count": 14,
+        "must_include": [
+          { "type": "CATEGORY_MINIMUM", "category": "Pilot", "min": 2, "notes": "2 must be additional Pilot skills" }
+        ],
+        "allowed_categories": [
+          { "category": "Communications", "restriction": "Radio skills only" },
+          { "category": "Domestic", "restriction": "Any" },
+          { "category": "Electrical", "restriction": "Basic Electronics only" },
+          { "category": "Espionage", "restriction": "None" },
+          { "category": "Mechanical", "restriction": "Auto and Mecha mechanics only", "bonus": { "percent": 5 } },
+          { "category": "Medical", "restriction": "First Aid only" },
+          { "category": "Physical", "restriction": "Any" },
+          { "category": "Pilot", "restriction": "Any", "bonus": { "percent": 10, "notes": "aircraft +10% / land vehicles +15% (see Pilot Related too)" } },
+          { "category": "Pilot Related", "restriction": "Any", "bonus": { "percent": 20 } },
+          { "category": "Science", "restriction": "Mathematics (basic only)" },
+          { "category": "Technology", "restriction": "Computer skills only" },
+          { "category": "W.P.", "restriction": "Any" }
+        ],
+        "notes": "Can take additional Mecha Combat as other skills without limit."
+      }
+    },
+    {
+      "id": "occ_veritech_fighter_pilot",
+      "factions": ["RDF"],
+      "name_en": "Veritech Fighter Pilot",
+      "name_es": "Piloto de Veritech",
+      "attribute_requirements": {
+        "minimums": { "IQ": 8 },
+        "preferred": ["P.P. 9+"],
+        "notes": "P.P. 9+ preferred"
+      },
+      "description_es": "Piloto élite de mecha transformable (aire/tierra/espacio). Entrenamiento de combate integral y operación de sistemas avanzados. Puede aprender Destroids como 'other skills'.",
+      "occ_skills": [
+        { "skill": "Pilot Jet", "rule_type": "BONUS_PERCENT", "bonus": 20 },
+        { "skill": "Pilot Veritech Fighter", "rule_type": "BASE_PLUS_PER_LEVEL", "base": 70, "per_level": 3, "notes": "per level of experience" },
+        { "skill": "Mecha Combat: Veritech Fighter only", "rule_type": "TEXT_ONLY" },
+        { "skill": "Weapon Systems", "rule_type": "BONUS_PERCENT", "bonus": 20 },
+        { "skill": "Read Sensory Instruments", "rule_type": "BONUS_PERCENT", "bonus": 15 },
+        { "skill": "Navigation", "rule_type": "BONUS_PERCENT", "bonus": 15 },
+        {
+          "skill": "Hand to Hand: Expert",
+          "rule_type": "TEXT_ONLY",
+          "notes": "can be changed to Martial Arts at cost of one skill"
+        }
+      ],
+      "other_skills": {
+        "select_count": 14,
+        "must_include": [
+          { "type": "TEXT", "notes": "one must be an additional aircraft pilot skill" }
+        ],
+        "allowed_categories": [
+          { "category": "Communications", "restriction": "Radio skills only" },
+          { "category": "Domestic", "restriction": "Any" },
+          { "category": "Electrical", "restriction": "Basic electronics only" },
+          { "category": "Espionage", "restriction": "None" },
+          { "category": "Mechanical", "restriction": "Auto, aircraft, Veritech and Mecha mechanics only", "bonus": { "percent": 5 } },
+          { "category": "Medical", "restriction": "First Aid only" },
+          { "category": "Physical", "restriction": "Any" },
+          { "category": "Pilot", "restriction": "Any", "bonus": { "percent": 10, "notes": "on all aircraft" } },
+          { "category": "Pilot Related", "restriction": "Any", "bonus": { "percent": 10 } },
+          { "category": "Science", "restriction": "Mathematics basic only" },
+          { "category": "Technology", "restriction": "Computer and photo skills only" },
+          { "category": "W.P.", "restriction": "Any" }
+        ]
+      }
+    },
+    {
+      "id": "occ_communications_engineer",
+      "factions": ["RDF"],
+      "name_en": "Communications Engineer",
+      "name_es": "Ingeniero de comunicaciones",
+      "attribute_requirements": {
+        "minimums": { "IQ": 10 },
+        "preferred": [],
+        "notes": ""
+      },
+      "description_es": "Especialista en comunicaciones, sensores, vigilancia y soporte táctico. Coordina operaciones, interpreta datos y mantiene enlaces (radio/satélite/láser).",
+      "occ_skills": [
+        { "skill": "Laser communications", "rule_type": "BONUS_PERCENT", "bonus": 15 },
+        { "skill": "Radio: Basic", "rule_type": "BONUS_PERCENT", "bonus": 30 },
+        { "skill": "Radio: Scramblers", "rule_type": "BONUS_PERCENT", "bonus": 15 },
+        { "skill": "Radio: Satellite Relay", "rule_type": "BONUS_PERCENT", "bonus": 30 },
+        { "skill": "Surveillance Systems", "rule_type": "BONUS_PERCENT", "bonus": 10 },
+        { "skill": "Read Sensory Instruments", "rule_type": "BONUS_PERCENT", "bonus": 10 },
+        { "skill": "Weapon Systems", "rule_type": "BONUS_PERCENT", "bonus": 10 },
+        { "skill": "Computer Operation", "rule_type": "BONUS_PERCENT", "bonus": 15 }
+      ],
+      "other_skills": {
+        "select_count": 16,
+        "notes": "hand to hand basic=1, expert=2, martial arts=3 (skill selection cost)",
+        "allowed_categories": [
+          { "category": "Communications", "restriction": "Any", "bonus": { "percent": 10 } },
+          { "category": "Domestic", "restriction": "Any" },
+          { "category": "Electrical", "restriction": "Basic Electronics only", "bonus": { "percent": 5 } },
+          { "category": "Espionage", "restriction": "None" },
+          { "category": "Mechanical", "restriction": "Automotive, aircraft and computer repair only" },
+          { "category": "Medical", "restriction": "First Aid only" },
+          { "category": "Physical", "restriction": "Any" },
+          { "category": "Pilot", "restriction": "Any" },
+          { "category": "Pilot Related", "restriction": "Any", "bonus": { "percent": 10 } },
+          { "category": "Science", "restriction": "Mathematics basic; Advanced Technical: Computer and photo only", "bonus": { "percent": 5 } },
+          { "category": "W.P.", "restriction": "Any" }
+        ]
+      }
+    },
+    {
+      "id": "occ_electrical_engineer",
+      "factions": ["RDF"],
+      "name_en": "Electrical Engineer",
+      "name_es": "Ingeniero eléctrico",
+      "attribute_requirements": {
+        "minimums": { "IQ": 7 },
+        "preferred": ["High P.P."],
+        "notes": "high P.P. preferred, not mandatory"
+      },
+      "description_es": "Experto en electrónica aplicada (computadoras, sensores, sistemas eléctricos y mecha-electrónica). Fundamental para mantenimiento y reparación.",
+      "occ_skills": [
+        { "skill": "Computer Operations", "rule_type": "BONUS_PERCENT", "bonus": 10 },
+        { "skill": "Computer Repair", "rule_type": "BONUS_PERCENT", "bonus": 15 },
+        { "skill": "Electrical Engineering", "rule_type": "BONUS_PERCENT", "bonus": 15 },
+        { "skill": "Mecha Electronics", "rule_type": "BONUS_PERCENT", "bonus": 20 },
+        { "skill": "Read Sensory Instruments", "rule_type": "BONUS_PERCENT", "bonus": 5 },
+        { "skill": "Basic Mathematics", "rule_type": "BONUS_PERCENT", "bonus": 10 },
+        { "skill": "Advanced Mathematics", "rule_type": "BONUS_PERCENT", "bonus": 10 }
+      ],
+      "other_skills": {
+        "select_count": 16,
+        "allowed_categories": [
+          { "category": "Communications", "restriction": "Any", "bonus": { "percent": 5 } },
+          { "category": "Domestic", "restriction": "Any" },
+          { "category": "Electrical", "restriction": "Any", "bonus": { "percent": 10 } },
+          { "category": "Espionage", "restriction": "None" },
+          { "category": "Mechanical", "restriction": "Any", "bonus": { "percent": 5 } },
+          { "category": "Physical", "restriction": "Any" },
+          { "category": "Pilot", "restriction": "Any" },
+          { "category": "Pilot Related", "restriction": "Any", "bonus": { "percent": 5 } },
+          { "category": "Science", "restriction": "None" },
+          { "category": "Technical", "restriction": "Computer and Photo only", "bonus": { "percent": 10 } },
+          { "category": "W.P.", "restriction": "Any" }
+        ]
+      }
+    },
+    {
+      "id": "occ_field_scientist",
+      "factions": ["RDF"],
+      "name_en": "Field Scientist",
+      "name_es": "Científico de campo",
+      "attribute_requirements": {
+        "minimums": { "IQ": 12 },
+        "preferred": ["High M.E."],
+        "notes": "high M.E. helpful, not required"
+      },
+      "description_es": "Analista e investigador generalista. Ideal para reconocimiento y toma de decisiones basadas en datos, con capacidades médicas para supervivencia.",
+      "occ_skills": [
+        { "skill": "Computer Operation", "rule_type": "BONUS_PERCENT", "bonus": 15 },
+        { "skill": "Computer Programming", "rule_type": "BONUS_PERCENT", "bonus": 10 },
+        { "skill": "Medical: Paramedic", "rule_type": "BONUS_PERCENT", "bonus": 10, "notes": "can be upgraded to Medical Doctor (counts as two skill selections)" },
+        { "skill": "Mathematics Basic", "rule_type": "BONUS_PERCENT", "bonus": 10 },
+        { "skill": "Mathematics Advanced", "rule_type": "BONUS_PERCENT", "bonus": 10 }
+      ],
+      "other_skills": {
+        "select_count": 18,
+        "must_include": [
+          { "type": "TEXT", "notes": "At least 4 should be from science, medical and technical categories combined." }
+        ],
+        "allowed_categories": [
+          { "category": "Communications", "restriction": "Radio, Optic Systems and T.V./Video only", "bonus": { "percent": 5 } },
+          { "category": "Domestic", "restriction": "Any" },
+          { "category": "Electrical", "restriction": "Any", "bonus": { "percent": 5 } },
+          { "category": "Espionage", "restriction": "Wilderness Survival and Land Navigation only" },
+          { "category": "Mechanical", "restriction": "Any", "bonus": { "percent": 5 } },
+          { "category": "Medical", "restriction": "Any", "bonus": { "percent": 10 } },
+          { "category": "Physical", "restriction": "Any" },
+          { "category": "Pilot", "restriction": "Any" },
+          { "category": "Pilot Related", "restriction": "Any" },
+          { "category": "Science", "restriction": "Any", "bonus": { "percent": 15 } },
+          { "category": "Technical", "restriction": "Any", "bonus": { "percent": 10 } },
+          { "category": "W.P.", "restriction": "Any" }
+        ]
+      }
+    },
+    {
+      "id": "occ_mechanical_engineer",
+      "factions": ["RDF"],
+      "name_en": "Mechanical Engineer",
+      "name_es": "Ingeniero mecánico",
+      "attribute_requirements": {
+        "minimums": { "IQ": 7 },
+        "preferred": ["High P.P."],
+        "notes": "high P.P. preferred, not required"
+      },
+      "description_es": "Técnico maestro en mecánica de vehículos, mechas y armamento. Mantiene operativa la maquinaria en condiciones hostiles.",
+      "occ_skills": [
+        { "skill": "Mechanical Engineering", "rule_type": "BONUS_PERCENT", "bonus": 20 },
+        { "skill": "Mecha Mechanic", "rule_type": "BONUS_PERCENT", "bonus": 20 },
+        { "skill": "Weapon Systems", "rule_type": "BONUS_PERCENT", "bonus": 10 },
+        { "skill": "Pilot Automobile", "rule_type": "BONUS_PERCENT", "bonus": 10 },
+        { "skill": "Computer Operation", "rule_type": "TEXT_ONLY" }
+      ],
+      "other_skills": {
+        "select_count": 16,
+        "must_include": [
+          { "type": "CATEGORY_MINIMUM", "category": "Mechanical", "min": 2, "notes": "at least 2 must be mechanical" }
+        ],
+        "allowed_categories": [
+          { "category": "Communications", "restriction": "Any" },
+          { "category": "Domestic", "restriction": "Any", "bonus": { "percent": 5 } },
+          { "category": "Electrical", "restriction": "Any", "bonus": { "percent": 5 } },
+          { "category": "Espionage", "restriction": "None" },
+          { "category": "Mechanical", "restriction": "Any", "bonus": { "percent": 15 } },
+          { "category": "Medical", "restriction": "First Aid or Paramedic", "notes": "Paramedic counts as 2 skills" },
+          { "category": "Physical", "restriction": "Any" },
+          { "category": "Pilot", "restriction": "Any", "bonus": { "percent": 0, "notes": "ground vehicle +10% / aircraft +5%" } },
+          { "category": "Pilot Related", "restriction": "Any" },
+          { "category": "Science", "restriction": "Mathematics Basic and Advanced only" },
+          { "category": "Technical", "restriction": "Computer and Photo only", "bonus": { "percent": 5 } },
+          { "category": "W.P.", "restriction": "Any" }
+        ]
+      }
+    },
+    {
+      "id": "occ_military_specialist",
+      "factions": ["RDF"],
+      "name_en": "Military Specialist",
+      "name_es": "Especialista militar",
+      "attribute_requirements": {
+        "minimums": { "IQ": 10, "PP": 10 },
+        "preferred": [],
+        "notes": ""
+      },
+      "description_es": "Operador táctico orientado a combate y espionaje: reconocimiento, inteligencia, infiltración y operaciones clandestinas. No puede ser Veritech Fighter Pilot en esta O.C.C.",
+      "occ_skills": [
+        { "skill": "Intelligence", "rule_type": "BONUS_PERCENT", "bonus": 20 },
+        { "skill": "Interrogation", "rule_type": "BONUS_PERCENT", "bonus": 10 },
+        { "skill": "Pilot Automobile", "rule_type": "TEXT_ONLY" },
+        { "skill": "W.P. Revolver", "rule_type": "TEXT_ONLY" },
+        { "skill": "W.P. Semi and Fully Automatic Rifle", "rule_type": "TEXT_ONLY" },
+        { "skill": "Hand to Hand (choose one: Expert or Martial Arts)", "rule_type": "CHOICE", "choices": 1 }
+      ],
+      "other_skills": {
+        "select_count": 18,
+        "must_include": [
+          { "type": "CATEGORY_MINIMUM", "category": "Espionage", "min": 4 },
+          { "type": "CATEGORY_MINIMUM", "category": "Physical", "min": 2 },
+          { "type": "CATEGORY_MINIMUM", "category": "W.P.", "min": 2, "notes": "additional W.P." }
+        ],
+        "allowed_categories": [
+          { "category": "Communications", "restriction": "Any" },
+          { "category": "Domestic", "restriction": "Any" },
+          { "category": "Electrical", "restriction": "Basic Electronics only" },
+          { "category": "Espionage", "restriction": "Any", "bonus": { "percent": 15 } },
+          { "category": "Mechanical", "restriction": "Auto or Aircraft Mechanics only" },
+          { "category": "Medical", "restriction": "First Aid or Paramedic only", "bonus": { "percent": 5 } },
+          { "category": "Physical", "restriction": "Any", "bonus": { "percent": 10, "notes": "applies to skill percentages (e.g., Prowl)" } },
+          { "category": "Pilot", "restriction": "Any" },
+          { "category": "Pilot Related", "restriction": "Any" },
+          { "category": "Science", "restriction": "Mathematics basic" },
+          { "category": "Technology", "restriction": "Any", "bonus": { "percent": 15, "notes": "including demolitions; +15% on Demolitions" } },
+          { "category": "W.P.", "restriction": "Any" }
+        ],
+        "notes": "Veritech Fighter Pilot is not available to this O.C.C."
+      }
+    }
+  ]
+}

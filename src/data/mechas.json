@@ -1,0 +1,53 @@
+{
+  "mecha": [
+    {
+      "id": "vf1s_veritech",
+      "name": "VF-1S Veritech Fighter",
+      "faction": "RDF",
+      "description": "Caza transformable multifunción usado por la RDF/U.N. Spacy.",
+      "stats": {
+        "crew": "1",
+        "weight": "18.5 tons",
+        "speed": "Mach 4 (jet)",
+        "height_battloid": "13m",
+        "armament": "GU-11 gun pod, head lasers, missiles"
+      }
+    },
+    {
+      "id": "destroid_excaliber",
+      "name": "Destroid Excaliber",
+      "faction": "RDF",
+      "description": "Destroid pesado de asalto con cañones de haz y misiles.",
+      "stats": {
+        "crew": "1-2",
+        "weight": "31 tons",
+        "speed": "50mph",
+        "armament": "Particle beam cannons, missile pods"
+      }
+    },
+    {
+      "id": "vht1_hover_tank",
+      "name": "VHT-1 Hover Tank",
+      "faction": "Southern Cross",
+      "description": "Tanque flotante de apoyo con armamento medio.",
+      "stats": {
+        "crew": "2",
+        "weight": "12 tons",
+        "speed": "60mph",
+        "armament": "Auto-cannons, short-range missiles"
+      }
+    },
+    {
+      "id": "ajacs_a9",
+      "name": "AJACS A-9",
+      "faction": "Southern Cross",
+      "description": "Unidad aérea multirole de la Southern Cross.",
+      "stats": {
+        "crew": "1",
+        "weight": "10 tons",
+        "speed": "Mach 2",
+        "armament": "Light missiles, laser turrets"
+      }
+    }
+  ]
+}

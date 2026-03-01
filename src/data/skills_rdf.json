@@ -1,0 +1,363 @@
+{
+  "schema_version": "1.0",
+  "game": "Robotech RPG (Palladium)",
+  "source": {
+    "file": "Robotech - Book 01 - Main.pdf",
+    "pages": "25-31 (skills list + descriptions)"
+  },
+  "skills_by_category": {
+    "COMMUNICATIONS": {
+      "Cryptography": {
+        "base": 30,
+        "per_level": 5
+      },
+      "Laser": {
+        "base": 40,
+        "per_level": 5
+      },
+      "Optic Systems": {
+        "base": 50,
+        "per_level": 5
+      },
+      "Radio: Basic": {
+        "base": 50,
+        "per_level": 5
+      },
+      "Radio: Scrambler": {
+        "base": 40,
+        "per_level": 5
+      },
+      "Radio: Satellite": {
+        "base": 25,
+        "per_level": 5
+      },
+      "Surveillance": {
+        "base": 40,
+        "per_level": 5
+      },
+      "T.V./Video": {
+        "base": null,
+        "per_level": null
+      }
+    },
+    "DOMESTIC": {
+      "Cook": {
+        "base": 50,
+        "per_level": 8
+      },
+      "Dance": {
+        "base": 40,
+        "per_level": 6
+      },
+      "Fish": {
+        "base": 60,
+        "per_level": 5
+      },
+      "Sew": {
+        "base": null,
+        "per_level": null
+      },
+      "Sing": {
+        "base": null,
+        "per_level": null
+      }
+    },
+    "ELECTRICAL": {
+      "Basic Electronics": {
+        "base": null,
+        "per_level": null
+      },
+      "Electrical Engineer": {
+        "base": 45,
+        "per_level": 5
+      },
+      "Mecha Electronics": {
+        "base": 35,
+        "per_level": 5
+      }
+    },
+    "ESPIONAGE/MILITARY": {
+      "Detect Ambush": {
+        "base": 50,
+        "per_level": 5
+      },
+      "Detect Concealment": {
+        "base": 40,
+        "per_level": 5
+      },
+      "Disguise": {
+        "base": 50,
+        "per_level": 5
+      },
+      "Escape Artist": {
+        "base": 30,
+        "per_level": 5
+      },
+      "Forgery": {
+        "base": 30,
+        "per_level": 5
+      },
+      "Intelligence": {
+        "base": 45,
+        "per_level": 5
+      },
+      "Impersonation": {
+        "base": null,
+        "per_level": null
+      },
+      "Interrogation": {
+        "base": 40,
+        "per_level": 5
+      },
+      "Land Navigation": {
+        "base": null,
+        "per_level": null
+      },
+      "Pick Locks": {
+        "base": 35,
+        "per_level": 5
+      },
+      "Pick Pockets": {
+        "base": 30,
+        "per_level": 5
+      },
+      "Sniper": {
+        "base": null,
+        "per_level": null
+      },
+      "Tracking": {
+        "base": 35,
+        "per_level": 5
+      },
+      "Wilderness Survival": {
+        "base": 40,
+        "per_level": 5
+      }
+    },
+    "MECHANICAL": {
+      "Automotive Mechanics": {
+        "base": 50,
+        "per_level": 5
+      },
+      "Aircraft Mechanics": {
+        "base": 45,
+        "per_level": 5
+      },
+      "Computer Repair": {
+        "base": 40,
+        "per_level": 5
+      },
+      "Locksmith": {
+        "base": 25,
+        "per_level": 5
+      },
+      "Mecha Mechanics": {
+        "base": null,
+        "per_level": null
+      },
+      "Mechanical Engineering": {
+        "base": 45,
+        "per_level": 5
+      },
+      "Veritech Mechanics": {
+        "base": null,
+        "per_level": null
+      }
+    },
+    "MEDICAL": {
+      "Criminal Science/Forensics": {
+        "base": 35,
+        "per_level": 5
+      },
+      "First Aid": {
+        "base": 50,
+        "per_level": 6
+      },
+      "Medical Doctor": {
+        "base": null,
+        "per_level": null
+      },
+      "Paramedic": {
+        "base": null,
+        "per_level": null
+      },
+      "Pathology": {
+        "base": null,
+        "per_level": null
+      }
+    },
+    "PHYSICAL": {
+      "Hand to Hand Basic": {
+        "base": null,
+        "per_level": null
+      },
+      "Hand to Hand Expert": {
+        "base": null,
+        "per_level": null
+      },
+      "Hand to Hand Martial Arts": {
+        "base": null,
+        "per_level": null
+      },
+      "Body Building": {
+        "base": null,
+        "per_level": null
+      },
+      "Boxing": {
+        "base": null,
+        "per_level": null
+      },
+      "Climbing": {
+        "base": 50,
+        "per_level": 5
+      },
+      "Fencing": {
+        "base": null,
+        "per_level": null
+      },
+      "Gymnastics": {
+        "base": null,
+        "per_level": null
+      },
+      "Prowl": {
+        "base": 40,
+        "per_level": 5
+      },
+      "Swimming": {
+        "base": 50,
+        "per_level": 8
+      },
+      "Swimming S.C.U.B.A.": {
+        "base": 50,
+        "per_level": 5
+      },
+      "Wrestling": {
+        "base": null,
+        "per_level": null
+      }
+    },
+    "PILOT": {
+      "Automobile": {
+        "base": 80,
+        "per_level": 4
+      },
+      "Mecha (Destroid only)": {
+        "base": null,
+        "per_level": null
+      },
+      "Mecha Combat": {
+        "base": null,
+        "per_level": null
+      },
+      "Motorcycle": {
+        "base": 60,
+        "per_level": 4
+      },
+      "Truck": {
+        "base": 66,
+        "per_level": 4
+      },
+      "Tank": {
+        "base": 50,
+        "per_level": 5
+      },
+      "Helicopter": {
+        "base": 60,
+        "per_level": 4
+      },
+      "Jet": {
+        "base": 60,
+        "per_level": 4
+      },
+      "Lancer Space Fighter": {
+        "base": 60,
+        "per_level": 4
+      },
+      "Space Shuttle": {
+        "base": 60,
+        "per_level": 4
+      },
+      "Boats: Sail": {
+        "base": 80,
+        "per_level": 4
+      },
+      "Boats: Motor": {
+        "base": 80,
+        "per_level": 4
+      }
+    },
+    "PILOT RELATED SKILLS": {
+      "Navigation (Air, Land, Water)": {
+        "base": 60,
+        "per_level": 5
+      },
+      "Navigation: Space": {
+        "base": 60,
+        "per_level": 5
+      },
+      "Read Sensory Instruments": {
+        "base": 40,
+        "per_level": 5
+      },
+      "Weapon Systems (missiles, lasers, etc.)": {
+        "base": 60,
+        "per_level": 5
+      }
+    },
+    "SCIENCE": {
+      "Astrophysics": {
+        "base": 30,
+        "per_level": 5
+      },
+      "Biology": {
+        "base": null,
+        "per_level": null
+      },
+      "Botany": {
+        "base": 40,
+        "per_level": 5
+      },
+      "Chemistry": {
+        "base": 45,
+        "per_level": 5
+      },
+      "Chemistry: Analytical": {
+        "base": null,
+        "per_level": null
+      },
+      "Mathematics: Basic": {
+        "base": 80,
+        "per_level": 4
+      },
+      "Mathematics: Advanced": {
+        "base": 64,
+        "per_level": 4
+      }
+    },
+    "TECHNICAL": {
+      "Computer Operation": {
+        "base": 60,
+        "per_level": 5
+      },
+      "Computer Programming": {
+        "base": 40,
+        "per_level": 5
+      },
+      "Demolitions": {
+        "base": 60,
+        "per_level": 5
+      },
+      "Demolitions: Disposal": {
+        "base": 60,
+        "per_level": 5
+      },
+      "Photography": {
+        "base": 50,
+        "per_level": 5
+      }
+    }
+  },
+  "weapon_proficiencies": {
+    "note": "W.P. entries are listed in the skills list, but their mechanics are handled in the combat section tables; store as tags rather than base/per_level."
+  }
+}

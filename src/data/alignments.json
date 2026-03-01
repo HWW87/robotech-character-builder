@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.0",
+  "game": "Robotech RPG (Palladium)",
+  "alignment_system": "Palladium (9 Alignments)",
+  "alignments": [
+    {
+      "id": "principled",
+      "name_en": "Principled",
+      "name_es": "Principista",
+      "descripcion_es": "Personaje profundamente ético que sigue un código moral elevado. Valora la vida, la justicia y el honor por encima de intereses personales.",
+      "filosofia_es": "El fin no justifica los medios. La integridad es innegociable.",
+      "comportamiento_tactico_es": "Evita daño colateral, protege civiles, no traiciona ni usa tácticas deshonrosas.",
+      "es_bueno": true,
+      "es_malvado": false,
+      "es_caotico": false,
+      "etiquetas": ["honor", "protector", "idealista"]
+    },
+    {
+      "id": "scrupulous",
+      "name_en": "Scrupulous",
+      "name_es": "Escrupuloso",
+      "descripcion_es": "Buena persona, pero más pragmática que el Principled. Tiene límites morales claros pero puede flexibilizar métodos si la situación lo exige.",
+      "filosofia_es": "Hacer lo correcto, pero sin ingenuidad.",
+      "comportamiento_tactico_es": "Evita dañar inocentes, pero acepta acciones grises si el objetivo lo amerita.",
+      "es_bueno": true,
+      "es_malvado": false,
+      "es_caotico": false,
+      "etiquetas": ["moral", "pragmatico", "realista"]
+    },
+    {
+      "id": "unprincipled",
+      "name_en": "Unprincipled",
+      "name_es": "No Principista",
+      "descripcion_es": "Tiene valores personales pero no se considera moralmente obligado a cumplir estándares elevados. Puede mentir o robar si lo considera necesario.",
+      "filosofia_es": "Sobrevivir primero, moral después.",
+      "comportamiento_tactico_es": "Cumple su palabra si le conviene, pero prioriza su beneficio.",
+      "es_bueno": false,
+      "es_malvado": false,
+      "es_caotico": false,
+      "etiquetas": ["pragmatico", "egoista", "flexible"]
+    },
+    {
+      "id": "anarchist",
+      "name_en": "Anarchist",
+      "name_es": "Anarquista",
+      "descripcion_es": "Valora su libertad por encima de todo. Desconfía de la autoridad y rechaza estructuras rígidas.",
+      "filosofia_es": "Nadie me dice qué hacer.",
+      "comportamiento_tactico_es": "Improvisa, rompe reglas, puede ser impredecible.",
+      "es_bueno": false,
+      "es_malvado": false,
+      "es_caotico": true,
+      "etiquetas": ["libertad", "caotico", "independiente"]
+    },
+    {
+      "id": "aberrant",
+      "name_en": "Aberrant",
+      "name_es": "Aberrante",
+      "descripcion_es": "Posee un código moral propio, pero es egoísta y despiadado cuando lo considera necesario. No es completamente cruel, pero sí peligroso.",
+      "filosofia_es": "Mi código, mis reglas.",
+      "comportamiento_tactico_es": "Puede traicionar si su código lo permite, no siente culpa por dañar enemigos.",
+      "es_bueno": false,
+      "es_malvado": true,
+      "es_caotico": false,
+      "etiquetas": ["egoista", "frio", "codigo_propio"]
+    },
+    {
+      "id": "miscreant",
+      "name_en": "Miscreant",
+      "name_es": "Malhechor",
+      "descripcion_es": "Actúa sin considerar el bienestar ajeno. Busca beneficio personal y puede traicionar con facilidad.",
+      "filosofia_es": "Yo primero, siempre.",
+      "comportamiento_tactico_es": "No respeta alianzas si dejan de ser útiles.",
+      "es_bueno": false,
+      "es_malvado": true,
+      "es_caotico": false,
+      "etiquetas": ["traicion", "egoista", "oportunista"]
+    },
+    {
+      "id": "diabolic",
+      "name_en": "Diabolic",
+      "name_es": "Diabólico",
+      "descripcion_es": "Cruel y manipulador. Disfruta ejercer poder y dominar a otros.",
+      "filosofia_es": "El poder es lo único que importa.",
+      "comportamiento_tactico_es": "Manipula, engaña y destruye sin remordimiento.",
+      "es_bueno": false,
+      "es_malvado": true,
+      "es_caotico": false,
+      "etiquetas": ["cruel", "manipulador", "dominante"]
+    }
+  ]
+}
