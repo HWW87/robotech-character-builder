@@ -38,7 +38,7 @@ export default function SkillsPage() {
       setError("At least one skill should be chosen");
       return;
     }
-    navigate("/mecha");
+    navigate("/equipment");
   };
 
   return (
@@ -50,7 +50,7 @@ export default function SkillsPage() {
         skills={otherSkillsChosen}
         onChange={handleSkills}
       />
-      <button onClick={handleNext}>Next → Mecha</button>
+      <button onClick={handleNext}>Next → Equipment</button>
     </>
   );
 }

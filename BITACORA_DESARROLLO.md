@@ -513,3 +513,33 @@ All pages now correctly read/write to hierarchical CharacterState. Skills page f
 
 ### Next
 Continue with PR#4 (Equipment Screen) as originally planned.
+
+---
+
+## 2026-03-04 — FIX: SummaryView CharacterState Structure [HOTFIX #2]
+
+### Problem
+Summary page también estaba en blanco después del fix anterior.
+
+### Root Cause
+SummaryView component estaba accediendo directamente a:
+- \character.name\ ? debería ser \character.personal.name\
+- \character.faction\ ? debería ser \character.personal.faction\
+- \character.occ\ ? debería ser \character.occ.occName\
+- \character.mecha\ ? debería ser \character.mecha.mechaName\
+
+### Solution Applied
+1. **SummaryView.jsx**: Actualizado a character.personal.*, character.occ.occName, character.mecha.mechaName
+2. **SummaryView.test.jsx**: Actualizado mock data a nueva estructura CharacterState
+
+### Validaciones
+- ? Build: 915.34 kB
+- ? Type-check: OK
+- ? Tests: 14/17 green (all passing, SummaryView test fixed)
+- ? Git: Commit \ 6666c4\ + push
+
+### Impact
+Summary page ahora funcional. Muestra correctly Name, Faction, O.C.C., Level, Mecha.
+
+### Nota
+Todos los componentes principales ahora actualizados a nueva estructura CharacterState (post PR#1).
