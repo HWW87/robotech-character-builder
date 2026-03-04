@@ -82,7 +82,7 @@ export default function MechaPage() {
       )}
 
       <div className="mt-4">
-        <button onClick={() => navigate("/summary")}>Next → Summary</button>
+        <button onClick={() => navigate("/alignment")}>Next → Alignment</button>
       </div>
     </div>
   );

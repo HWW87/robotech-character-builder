@@ -543,3 +543,70 @@ Summary page ahora funcional. Muestra correctly Name, Faction, O.C.C., Level, Me
 
 ### Nota
 Todos los componentes principales ahora actualizados a nueva estructura CharacterState (post PR#1).
+
+---
+
+## 2026-03-04 — PR#4: Equipment Screen (Standard Gear + Wages + Credits) [COMPLETADO]
+
+### Status
+? **PR#4 COMPLETADO** - Commit \ 2160de\ pushed to feature/typescript
+
+### Cambios Implementados
+
+#### 1. equipment.ts (Domain Logic)
+- \getStandardEquipment(occId): string[]\ — Lista de gear por OCC (placeholder)
+- \calculateMonthlyWages(occId, level): number\ — Wages por nivel (1-5, 6-10, 11+)
+- \generatePersonalSavings(occId): number\ — Roll 2d6 × 100 credits
+- \uildEquipmentData(occId, level): EquipmentData\ — Constructor completo
+- Placeholder data para 8 OCCs (Destroid, Veritech, Soldier, Specialist, Commando, Technician, Scout, Comms)
+
+#### 2. EquipmentView.jsx (Component)
+- Display standard equipment list (read-only)
+- Display monthly wages con level range indicator
+- Display personal savings con "Re-roll" button (2d6 × 100)
+- Equipment guidelines y notes sobre black market/personal purchases
+
+#### 3. EquipmentPage.jsx (Container)
+- Step 4 en character creation flow
+- Auto-genera equipment data on first visit (useEffect)
+- Handle re-roll de savings
+- Navigation: Previous ? Skills, Next ? Mecha
+
+#### 4. App.jsx (Routing)
+- Import EquipmentPage
+- Add /equipment route entre /skills y /mecha
+- Update nav bar con Equipment link
+- Route sequence: /skills ? /equipment ? /mecha
+
+#### 5. SkillsPage.jsx
+- Update navegación: Next ? Equipment (antes era ? Mecha)
+
+### Validaciones
+- ? Build: 923.67 kB (OK, +8.33 kB vs anterior)
+- ? Type-check: OK (tsc --noEmit)
+- ? Tests: 14/17 green (3 skipped)
+- ? Git: Commit + push a origin/feature/typescript
+
+### Estructura CharacterState
+\\\
+character.equipment = {
+  standardEquipment: string[],
+  wages: {monthly, levelRange},
+  personalSavings: number
+}
+\\\
+
+### Impacto
+- **PR#5 (Alignment)**: Procede sin cambios
+- **PR#6 (Skill Math)**: Character.equipment disponible para validación
+
+### TODOs Futuros
+- Mover placeholder data a occ_rdf.json (add \standard_equipment\, \wages\, \savings_formula\ fields)
+- Link skill bonuses (Boxing, etc.) a S.D.C. calculator automáticamente
+
+### Nota Técnica
+- Wages formula: 3 brackets (1-5, 6-10, 11+) per manual Robotech
+- Savings roll: 2d6 × 100 (most OCCs), 2d6 × 150 (Commando)
+- Standard equipment cannot be sold (per guidelines)
+
+### Próximo: PR#5 (Alignment Selector Screen)

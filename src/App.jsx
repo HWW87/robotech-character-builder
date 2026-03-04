@@ -8,6 +8,7 @@ import OCCPage from "./pages/OCCPage";
 import SkillsPage from "./pages/SkillsPage";
 import EquipmentPage from "./pages/EquipmentPage";
 import MechaPage from "./pages/MechaPage";
+import AlignmentPage from "./pages/AlignmentPage";
 import SummaryPage from "./pages/SummaryPage";
 import ManualsPage from "./pages/ManualsPage";
 
@@ -28,6 +29,7 @@ export default function App() {
             <Link to="/skills" className="hover:text-retroblue">Skills</Link>
             <Link to="/equipment" className="hover:text-retroblue">Equipment</Link>
             <Link to="/mecha" className="hover:text-retroblue">Mecha</Link>
+            <Link to="/alignment" className="hover:text-retroblue">Alignment</Link>
             <Link to="/summary" className="hover:text-retroblue font-semibold">Summary</Link>
             <Link to="/manuals" className="hover:text-retroblue">Manuales</Link>
           </nav>
@@ -44,6 +46,7 @@ export default function App() {
             <Route path="/skills" element={<SkillsPage />} />
             <Route path="/equipment" element={<EquipmentPage />} />
             <Route path="/mecha" element={<MechaPage />} />
+            <Route path="/alignment" element={<AlignmentPage />} />
             <Route path="/summary" element={<SummaryPage />} />
             <Route path="/manuals" element={<ManualsPage />} />
           </Routes>
