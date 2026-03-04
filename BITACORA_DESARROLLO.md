@@ -476,3 +476,40 @@ character.vitality = {
 - Skill bonuses (Boxing, etc.) implementado como input manual (future: load from skills)
 
 ### Próximo: PR#4 (Equipment Screen)
+
+---
+
+## 2026-03-04 — FIX: Pages Updated for CharacterState Structure [HOTFIX]
+
+### Problem
+Skills page (and other pages) were blank after PR#1 because components were accessing old CharacterState paths.
+
+### Root Cause
+PR#1 changed CharacterState from flat structure to hierarchical:
+- OLD: \character.faction\, \character.occ\ (string), \character.skills\ (array)
+- NEW: \character.personal.faction\, \character.occ\ (object), \character.occ.otherSkillsChosen\
+
+Pages were still using old paths ? blank screens/errors.
+
+### Solution Applied
+Updated all affected pages to use new CharacterState structure:
+
+#### Pages Fixed
+1. **SkillsPage.jsx**: Extract \personal.faction\, \occ.occName\, \occ.otherSkillsChosen\
+2. **OCCPage.jsx**: Extract \personal.faction\, \occ.occName\, update entire \occ\ object
+3. **MechaPage.jsx**: Extract \personal.faction\, \mecha.mechaName\
+4. **SummaryPage.jsx**: Extract \level.currentLevel\, \occ.occSkills\, \occ.otherSkillsChosen\
+5. **PersonalDataPage.jsx**: Pass \character.personal\, update personal subfields
+6. **FactionPage.jsx**: Update \character.personal.faction\
+
+### Validaciones
+- ? Build: 915.30 kB
+- ? Type-check: OK
+- ? Tests: 14/17 green
+- ? Git: Commit \d1124a0\ + push
+
+### Impact
+All pages now correctly read/write to hierarchical CharacterState. Skills page functional again.
+
+### Next
+Continue with PR#4 (Equipment Screen) as originally planned.
