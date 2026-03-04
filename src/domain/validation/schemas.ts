@@ -14,12 +14,14 @@ import { Era, SkillCategory } from '../shared/types';
 
 /**
  * Esquema para validar un Skill desde JSON
+ * Nota: category es string porque puede venir de JSON con diferentes formatos
+ * Se valida al mapear al domain
  */
 export const SkillSchema = z.object({
   id: z.string().min(1),
   name_es: z.string().min(1),
   name_en: z.string().min(1),
-  category: z.nativeEnum(SkillCategory),
+  category: z.string().min(1), // Accept any string, validate context-specific values
   base: z.number().int().min(0).max(98),
   perLevel: z.number().int().min(0).max(10),
   exclusiveToOcc: z.string().optional(),
@@ -35,15 +37,15 @@ export const OccSchema = z.object({
   id: z.string().min(1),
   name_es: z.string().min(1),
   name_en: z.string().min(1),
-  category: z.string().min(1),
-  era: z.nativeEnum(Era),
-  description_es: z.string(),
-  factions: z.array(z.string()),
-  primarySkills: z.array(z.string()),
+  category: z.string().min(1).optional().default('Unknown'),
+  era: z.nativeEnum(Era).optional().default(Era.MACROSS),
+  description_es: z.string().optional().default(''),
+  factions: z.array(z.string()).optional().default([]),
+  primarySkills: z.array(z.string()).optional().default([]),
   secondarySkillsAllowed: z.object({
-    count: z.number().int().positive(),
-    categories: z.array(z.nativeEnum(SkillCategory)),
-  }),
+    count: z.number().int().positive().optional().default(6),
+    categories: z.array(z.nativeEnum(SkillCategory)).optional().default([]),
+  }).optional(),
 });
 
 export type ValidatedOcc = z.infer<typeof OccSchema>;
@@ -70,16 +72,21 @@ const WeaponSystemSchema = z.object({
 /**
  * Esquema para validar un Mecha desde JSON
  * Punto 12: Validar estructura normalizada de MDC y armas
+ * Nota: Muchos campos son opcionales por compatibilidad con mechas.json
  */
 export const MechaSchema = z.object({
   id: z.string().min(1),
-  name_es: z.string().min(1),
-  name_en: z.string().min(1),
-  era: z.nativeEnum(Era),
-  category: z.string().min(1),
-  description_es: z.string(),
-  mdcByLocation: z.record(z.string(), MDCLocationSchema),
-  weaponSystems: z.array(WeaponSystemSchema),
+  name_es: z.string().min(1).optional(),
+  name_en: z.string().min(1).optional(),
+  name: z.string().min(1).optional(), // Fallback from mechas.json
+  era: z.nativeEnum(Era).optional().default(Era.MACROSS),
+  category: z.string().min(1).optional().default('Unknown'),
+  description_es: z.string().optional().default(''),
+  description: z.string().optional().default(''), // Fallback
+  mdcByLocation: z.record(z.string(), MDCLocationSchema).optional().default({}),
+  mdc_by_location: z.record(z.string(), MDCLocationSchema).optional().default({}),
+  weaponSystems: z.array(WeaponSystemSchema).optional().default([]),
+  weapon_systems: z.array(WeaponSystemSchema).optional().default([]),
   modes: z.array(z.string()).optional(),
 });
 

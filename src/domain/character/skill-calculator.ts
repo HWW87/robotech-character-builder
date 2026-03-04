@@ -11,7 +11,7 @@
  * Punto 7: Si hasPerLevelAdvance=false, perLevelBonus=0
  */
 
-import type { Skill, SkillCalculationResult } from '../skills/skill';
+import type { Skill, SkillCalculationResult, SkillInstance } from '../skills/skill';
 
 /**
  * Calcula el total de un skill considerando todos los bonificadores
@@ -53,12 +53,18 @@ export function calculateSkillTotal(
 /**
  * Calcula todos los skills de un personaje
  * Combina primary y secondary skills
+ *
+ * @param primarySkills Skills primarios con sus IDs tipados
+ * @param secondarySkills Skills secundarios con sus IDs tipados
+ * @param skillMap Mapa de Skills por ID (SkillId → Skill)
+ * @param occBonuses Bonificadores por OCC (keyed by SkillId)
+ * @param characterLevel Nivel del personaje
  */
 export function calculateCharacterSkills(
-  primarySkills: Array<{ skillId: string; manualBonus?: number }>,
-  secondarySkills: Array<{ skillId: string; manualBonus?: number }>,
-  skillMap: Map<string, Skill>,
-  occBonuses: Record<string, number>,
+  primarySkills: SkillInstance[],
+  secondarySkills: SkillInstance[],
+  skillMap: Map<string, Skill>, // TODO: cambiar a Map<SkillId, Skill>
+  occBonuses: Record<string, number>, // TODO: cambiar a Record<SkillId, number>
   characterLevel: number
 ): SkillCalculationResult[] {
   const results: SkillCalculationResult[] = [];
@@ -70,13 +76,14 @@ export function calculateCharacterSkills(
   ];
 
   for (const instance of allSkills) {
-    const skill = skillMap.get(instance.skillId);
+    // Usar el skillId tipado directamente
+    const skill = skillMap.get(instance.skillId as string);
     if (!skill) {
       console.warn(`Skill no encontrado: ${instance.skillId}`);
       continue;
     }
 
-    const occBonus = occBonuses[skill.id] || 0;
+    const occBonus = occBonuses[instance.skillId as unknown as string] || 0;
     const manualBonus = instance.manualBonus || 0;
 
     const result = calculateSkillTotal(

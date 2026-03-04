@@ -4,7 +4,7 @@ import { calculateSkills } from './skillCalculator';
 // Use real skill names present in src/data/skills_rdf.json
 describe('calculateSkills', () => {
   it('combines OCC and secondary skills correctly using normalized names', () => {
-    // use an OCC skill that exists in json as "Jet" but is referenced in OCC data
+    // use an OCC skill that exists in json as "Jet" (Pilot prefix is handled by normalization)
     const occ = [{ name: 'Pilot Jet', bonus: 5 }];
     const sec = [{ name: 'Computer Operation' }];
     const result = calculateSkills(occ, sec, 3);
@@ -12,7 +12,7 @@ describe('calculateSkills', () => {
     // occ skill: base60 + bonus5 + perLevel*4*(level-1)=60+5+8=73
     // secondary skill: base60 + 0 = 60
     expect(result).toEqual([
-      expect.objectContaining({ name: 'Pilot Jet', total: 73, type: 'OCC' }),
+      expect.objectContaining({ name: 'Jet', total: 73, type: 'OCC' }),
       expect.objectContaining({ name: 'Computer Operation', total: 60, type: 'Secondary' }),
     ]);
   });

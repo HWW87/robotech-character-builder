@@ -66,6 +66,8 @@ export function generateSkillId(
  */
 export function normalizeSkillName(name: string): string {
   return name
+    .replace(/^Pilot\s+/i, '')  // Eliminar prefijo "Pilot "
+    .replace(/^W\.P\.\s+/i, '')  // Eliminar prefijo "W.P. "
     .toLowerCase()
     .trim()
     .replace(/\s+/g, ' ') // espacios múltiples → simple

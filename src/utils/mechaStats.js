@@ -761,18 +761,34 @@ const mechaData = {
 export default mechaData;
 
 // Helper functions for mecha lookups
+/**
+ * ⚠️ WRAPPER FUNCTIONS - Delegating to MechaRepository
+ *
+ * Las funciones anteriores buscaban en mechaData.mecha (inline)
+ * Ahora delegamos a MechaRepository que carga desde mechas.json
+ */
+
+import {
+  getMechaById as repoGetMechaById,
+  searchMechasByName,
+  getMechasByEra as repoGetMechasByEra,
+  getMechasByCategory as repoGetMechasByCategory,
+} from '../infrastructure/repositories/MechaRepository';
+
 export function getMechaByName(name) {
-  return mechaData.mecha.find((m) => m.name_es === name || m.name_es?.includes(name));
+  // Usar searchMechasByName que hace fuzzy matching
+  const results = searchMechasByName(name);
+  return results.length > 0 ? results[0] : null;
 }
 
 export function getMechaById(id) {
-  return mechaData.mecha.find((m) => m.id === id);
+  return repoGetMechaById(id);
 }
 
 export function getMechasByEra(era) {
-  return mechaData.mecha.filter((m) => m.era === era);
+  return repoGetMechasByEra(era);
 }
 
 export function getMechasByCategory(category) {
-  return mechaData.mecha.filter((m) => m.category === category);
+  return repoGetMechasByCategory(category);
 }
