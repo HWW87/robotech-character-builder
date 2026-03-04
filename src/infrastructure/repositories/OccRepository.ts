@@ -2,13 +2,15 @@
  * OCC Repository
  * Punto 8: Carga y validación de OCCs desde JSON
  * Punto 5: Proporciona métodos para resolver IDs y buscar OCCs
+ * Punto 2-FIX: Resuelve skills a IDs reales usando SkillRepository
  */
 
 import type { OCC } from '../../domain/occ/occ';
 import type { OccId, SkillId } from '../../domain/shared/types';
-import { createOccId, createSkillId } from '../../domain/shared/types';
+import { createOccId } from '../../domain/shared/types';
 import { validateOccs } from '../../domain/validation/schemas';
 import occRdfData from '../../data/occ_rdf.json';
+import { skillRepository } from './SkillRepository';
 
 /**
  * Singleton para manejar OCCs
@@ -51,8 +53,8 @@ class OccRepository {
           era: occ.era,
           description_es: occ.description_es,
           factions: occ.factions,
-          // Convertir skill names a IDs
-          primarySkills: (occ.primarySkills || []).map(s => createSkillId(s)),
+          // FIX 2: primarySkills ya son SkillIds reales del convertRdfToOccArray
+          primarySkills: (occ.primarySkills as any[]) || [],
           secondarySkillsAllowed: occ.secondarySkillsAllowed || {
             count: 6,
             categories: [],
@@ -103,10 +105,21 @@ class OccRepository {
     };
 
     for (const occ of occsData) {
-      // Extraer skill names de occ_skills
+      // FIX 2: Extraer skill names y resolver a IDs reales
+      const primarySkillIds: SkillId[] = [];
       const primarySkillNames = (occ.occ_skills || [])
         .map((s: any) => s.skill || '')
         .filter((s: string) => s.length > 0);
+
+      for (const skillName of primarySkillNames) {
+        const resolvedId = skillRepository.resolveSkillId(skillName);
+        if (resolvedId) {
+          primarySkillIds.push(resolvedId);
+        } else {
+          // DEV warning para detectar skills no resueltas
+          console.warn(`[OCC] Skill no resuelta: ${skillName} en OCC ${occ.name_en}`);
+        }
+      }
 
       // Normalizar allowed_categories
       let allowedCategories = [];
@@ -127,7 +140,7 @@ class OccRepository {
         era: occ.era || 'Macross',
         description_es: occ.description_es || '',
         factions: occ.factions || [],
-        primarySkills: primarySkillNames,
+        primarySkills: primarySkillIds,
         secondarySkillsAllowed: {
           count: occ.other_skills?.select_count || 6,
           categories: allowedCategories,

@@ -70,8 +70,10 @@ export function calculateSkills(
     const base = skill.base || 0;
     const perLevel = skill.perLevel || 0;
 
-    // Aplicar bonus per-level solo a skills principales
-    const perLevelBonus = isSecondary ? 0 : (perLevel * Math.max(0, level - 1));
+    // FIX 3: Permitir advancement por nivel para secondary skills por defecto
+    // Si la skill tiene advances_when_secondary: false, no aplicar advancement
+    const advances = skill.advances_when_secondary !== false;
+    const perLevelBonus = advances ? (perLevel * Math.max(0, level - 1)) : 0;
     const total = Math.min(base + bonus + perLevelBonus, 98); // cap en 98
 
     allSkills.push({

@@ -10,10 +10,10 @@ describe('calculateSkills', () => {
     const result = calculateSkills(occ, sec, 3);
 
     // occ skill: base60 + bonus5 + perLevel*4*(level-1)=60+5+8=73
-    // secondary skill: base60 + 0 = 60
+    // FIX 3: secondary skill also advances by level: base60 + 0 + perLevel*5*(level-1)=60+0+10=70
     expect(result).toEqual([
       expect.objectContaining({ name: 'Jet', total: 73, type: 'OCC' }),
-      expect.objectContaining({ name: 'Computer Operation', total: 60, type: 'Secondary' }),
+      expect.objectContaining({ name: 'Computer Operation', total: 70, type: 'Secondary' }),
     ]);
   });
 

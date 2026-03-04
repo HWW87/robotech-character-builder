@@ -93,6 +93,24 @@ export const MechaSchema = z.object({
 export type ValidatedMecha = z.infer<typeof MechaSchema>;
 
 /**
+ * Esquema para validar un Alignment desde JSON
+ */
+export const AlignmentSchema = z.object({
+  id: z.string().min(1),
+  name_en: z.string().min(1),
+  name_es: z.string().min(1),
+  descripcion_es: z.string().optional().default(''),
+  filosofia_es: z.string().optional().default(''),
+  comportamiento_tactico_es: z.string().optional().default(''),
+  es_bueno: z.boolean().optional().default(false),
+  es_malvado: z.boolean().optional().default(false),
+  es_caotico: z.boolean().optional().default(false),
+  etiquetas: z.array(z.string()).optional().default([]),
+});
+
+export type ValidatedAlignment = z.infer<typeof AlignmentSchema>;
+
+/**
  * Funciones de validación principales
  * Usadas en carga de datos (repositories)
  */
@@ -131,6 +149,19 @@ export function validateMechas(data: unknown): ValidatedMecha[] {
       const issues = error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('\n');
       console.error('❌ Error validando Mechas:', issues);
       throw new Error(`Mechas validation failed: ${error.message}`);
+    }
+    throw error;
+  }
+}
+
+export function validateAlignments(data: unknown): ValidatedAlignment[] {
+  try {
+    return z.array(AlignmentSchema).parse(data);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const issues = error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('\n');
+      console.error('❌ Error validando Alignments:', issues);
+      throw new Error(`Alignments validation failed: ${error.message}`);
     }
     throw error;
   }
