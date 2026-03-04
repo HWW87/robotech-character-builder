@@ -9,14 +9,26 @@ export default function MechaPage() {
   const { character, update } = useCharacterData();
   const navigate = useNavigate();
 
-  const selected = getMechaByName(character.mecha);
+  // Extract from new CharacterState structure (per PR#1)
+  const faction = character.personal?.faction || "";
+  const mechaName = character.mecha?.mechaName || "";
+
+  const selected = getMechaByName(mechaName);
+
+  const handleMechaSelect = (val) => {
+    // Update entire mecha object
+    update("mecha", {
+      mechaId: val, // TODO: map to proper mechaId
+      mechaName: val,
+    });
+  };
 
   return (
     <div>
       <MechaSelector
-        faction={character.faction}
-        mecha={character.mecha}
-        onSelect={(val) => update("mecha", val)}
+        faction={faction}
+        mecha={mechaName}
+        onSelect={handleMechaSelect}
       />
 
       {selected && (

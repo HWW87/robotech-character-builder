@@ -26,9 +26,11 @@ export default function SummaryPage() {
     });
   };
 
-  const level = character.level || 1;
-  const occSkills = character.occSkills || character.skills || [];
-  const secondarySkills = character.secondarySkills || [];
+  // Extract from new CharacterState structure (per PR#1)
+  const level = character.level?.currentLevel || 1;
+  const occSkills = character.occ?.occSkills || [];
+  const otherSkillsChosen = character.occ?.otherSkillsChosen || [];
+  const secondarySkills = []; // Legacy field, now empty
   const extraBonuses = character.extraBonuses || {};
 
   const calculated = useMemo(

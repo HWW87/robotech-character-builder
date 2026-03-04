@@ -406,3 +406,73 @@ Agregar entradas por fecha con:
 - ? Git: Commit + push
 
 ### Próximo: PR#3 (Vitality Screen)
+
+---
+
+## 2026-03-04 — PR#3: Vitality Screen (HP + S.D.C.) [COMPLETADO]
+
+### Status
+? **PR#3 COMPLETADO** - Commit \ecd23c8\ pushed to feature/typescript
+
+### Cambios Implementados
+
+#### 1. vitality.ts (Domain Logic)
+- \calculateHP(pe, initialRoll, level): HitPoints\
+  - HP = PE + 1d6 (at creation)
+  - Returns {base, initialRoll, totalAtLevel1}
+- \calculateSDC(baseByOcc, skillBonuses): SdcData\
+  - S.D.C. = OCC base + skill bonuses
+- \getSDCBaseByOcc(occId): number\
+  - Placeholder mapping with DEFAULT_SDC_BY_OCC
+  - TODO: Load from occ_rdf.json future
+
+#### 2. HPCalculator.jsx (Component)
+- Roll 1d6 button with visual feedback
+- Displays PE (base), Roll (1d6), Total
+- Calls onHPChange with HitPoints object
+- Styled per retro theme
+
+#### 3. SDCCalculator.jsx (Component)
+- Shows OCC base S.D.C.
+- Input field for skill bonuses (e.g., Boxing +5)
+- Displays Total S.D.C.
+- Calls onSDCChange with SdcData object
+
+#### 4. VitalityPage.jsx (Container)
+- Step 3 in character creation flow
+- Combines HPCalculator + SDCCalculator
+- Validates that both HP and S.D.C. are set before Next
+- Navigation: Previous ? Attributes, Next ? O.C.C.
+- Persists to character.vitality via update()
+
+#### 5. App.jsx (Routing)
+- Import VitalityPage
+- Add na route: /vitality ? VitalityPage
+- Insert in nav bar between Attributes and O.C.C.
+- Route sequence: /attributes ? /vitality ? /occ
+
+### Validaciones
+- ? Build: 915.03 kB (OK, +4.45 kB vs PR#2)
+- ? Type-check: OK (tsc --noEmit)
+- ? Tests: 14/17 green (3 skipped)
+- ? Git: Commit + push a origin/feature/typescript
+
+### Impacto
+- **PR#4 (Equipment)**: Procede sin cambios
+- **PR#5 (Alignment)**: Independent (no dependencies)
+- **PR#6 (Skill Math)**: Character.vitality now available for validation
+
+### Estructura CharacterState
+\\\
+character.vitality = {
+  hitPoints: {base, initialRoll, totalAtLevel1},
+  sdc: {baseByOcc, fromSkills?, total}
+}
+\\\
+
+### Nota Técnica
+- HP cálculo simple per Robotech spec (PE + 1d6)
+- S.D.C. base valores placeholder (pending occ_rdf.json update)
+- Skill bonuses (Boxing, etc.) implementado como input manual (future: load from skills)
+
+### Próximo: PR#4 (Equipment Screen)

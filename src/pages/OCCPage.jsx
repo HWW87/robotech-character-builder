@@ -9,13 +9,22 @@ export default function OCCPage() {
   const navigate = useNavigate();
   const [error, setError] = React.useState("");
 
+  // Extract from new CharacterState structure (per PR#1)
+  const faction = character.personal?.faction || "";
+  const occName = character.occ?.occName || "";
+
   const handleSelect = (val) => {
     setError(val ? "" : "Occupation must be selected");
-    update("occ", val);
+    // Update entire occ object with new occName
+    update("occ", {
+      ...character.occ,
+      occName: val,
+      occId: val, // TODO: map to proper occId from repository
+    });
   };
 
   const handleNext = () => {
-    if (!character.occ) {
+    if (!occName) {
       setError("Occupation must be selected");
       return;
     }
@@ -23,15 +32,15 @@ export default function OCCPage() {
   };
 
   const selectedDetails = React.useMemo(() => {
-    return character.occ ? getOccDetails(character.occ) : null;
-  }, [character.occ]);
+    return occName ? getOccDetails(occName) : null;
+  }, [occName]);
 
   return (
     <>
       {error && <p className="text-red-500 mb-2">{error}</p>}
       <OCCSelector
-        faction={character.faction}
-        occ={character.occ}
+        faction={faction}
+        occ={occName}
         onSelect={handleSelect}
       />
       {selectedDetails && (

@@ -7,8 +7,12 @@ export default function PersonalDataPage() {
   const { character, update } = useCharacterData();
   const navigate = useNavigate();
 
+  // Update character.personal fields (per PR#1 structure)
   const handleDataChange = (field, value) => {
-    update(field, value);
+    update("personal", {
+      ...character.personal,
+      [field]: value,
+    });
   };
 
   const handleNext = () => {
@@ -17,7 +21,7 @@ export default function PersonalDataPage() {
 
   return (
     <PersonalDataForm
-      characterData={character}
+      characterData={character.personal || {}}
       onDataChange={handleDataChange}
       onNext={handleNext}
     />

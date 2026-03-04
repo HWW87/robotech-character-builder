@@ -9,11 +9,15 @@ import { useCharacterData } from "../hooks/useCharacterData";
  * Delega presentación a FactionView (presentacional).
  */
 export default function FactionPage() {
-  const { update } = useCharacterData();
+  const { character, update } = useCharacterData();
   const navigate = useNavigate();
 
   const selectFaction = (f) => {
-    update("faction", f);
+    // Update character.personal.faction (per PR#1 structure)
+    update("personal", {
+      ...character.personal,
+      faction: f,
+    });
     navigate("/attributes");
   };
 
