@@ -333,6 +333,38 @@ PR#1 (Extend State) ← required by all
 
 ---
 
+## 2026-03-03 — PR#1 IMPLEMENTADO: Extend CharacterState
+
+### ✅ Completado
+- `src/domain/shared/types.ts`: 
+  - Agregadas interfaces completas: PersonalData, LevelData, VitalityData, OccData, SkillsData, EquipmentData, AlignmentData
+  - Nueva interface CharacterState (jerárquica, per spec)
+  - Tipo `AlignmentGroup` ('Good' | 'Selfish' | 'Evil')
+  
+- `src/hooks/useCharacterData.js`:
+  - Actualizado DEFAULT_CHARACTER_STATE a nueva estructura
+  - Agregada función `migrateCharacter()` para compatibilidad hacia atrás
+  - localStorage migration automática al cargar datos
+
+### 🎯 Impacto
+- TypeScript: ✅ type-check OK
+- Build: Pendiente verificar (esperado: warnings en componentes accediendo a campos viejo formato)
+- Tests: Pendiente verificar
+- Breaking Changes: SÍ (CharacterState.name → CharacterState.personal.name, etc.)
+
+### 📝 Próximo Paso
+PR#2 (Attributes Exceptional) depende de PR#1. Los componentes necesitarán actualizaciones para acceder a nueva estructura en PRs subsecuentes.
+
+### 🔄 Nota de Implementación
+Este PR es foundational. Los siguientes PRs actualizarán componentes para usar:
+- `character.personal.*` en lugar de `character.*` para nombre/edad/facción
+- `character.attributes` mantiene igual estructura interna
+- `character.vitality.hitPoints.total` para HP
+- `character.skills.calculatedSkills` para skills
+- etc.
+
+---
+
 ## Convención de actualización
 Agregar entradas por fecha con:
 1. Qué se cambió
