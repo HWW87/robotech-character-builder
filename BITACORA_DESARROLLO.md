@@ -703,3 +703,93 @@ character.alignment = {
 - No mechanical impact on character stats yet (may be added in future PRs)
 
 ### Próximo: PR#6 (Skill Math Refactor)
+
+---
+
+## 2026-03-04 - PR#6: Skill Math Refactor - IQ Bonus Application [COMPLETADO]
+
+### Status
+✅ **PR#6 COMPLETADO** - Commit `f1f16cb` pushed to feature/typescript
+
+### Cambios Implementados
+
+#### 1. domain/character/skill-calculator.ts
+- **Enhanced calculateSkillTotal()**:
+  - Added parameter: `iqBonusPercent?: number`
+  - Formula: `iqBonus = base * (iqBonusPercent / 100)` [aplicado una sola vez]
+  - Full formula: `total = base + occBonus + iqBonus + perLevelBonus + manualBonus`, capped at 98
+  - Updated JSDoc with full calculation explanation
+
+- **Enhanced calculateCharacterSkills()**:
+  - Added parameter: `iqBonusPercent?: number`
+  - Passes iqBonusPercent to each skill calculation via calculateSkillTotal()
+  - Applies global IQ bonus to all skills (primary + secondary)
+
+#### 2. domain/skills/skill.ts
+- **Updated SkillCalculationResult interface**:
+  - Added field: `readonly iqBonus: number`
+  - Now tracks IQ bonus component separately in calculation results
+
+#### 3. utils/skillCalculator.js
+- **Enhanced calculateSkills() signature**:
+  - Added parameter (5th): `iqBonusPercent = undefined`
+  - Implements IQ bonus calculation: `iqBonus = Math.floor(base * (iqBonusPercent / 100))`
+  - Updated total formula: `total = min(base + bonus + iqBonus + perLevelBonus, 98)`
+  - Each skill result includes iqBonus field
+
+#### 4. pages/SummaryPage.jsx
+- **Extract IQ bonus from CharacterState**:
+  - `const iqBonusPercent = character.attributeBonuses?.iqBonusPercent`
+  - Pass iqBonusPercent as 5th argument to calculateSkills()
+  - Update useMemo dependency array to include iqBonusPercent
+
+### Validaciones
+- ✅ Build: 927.93 kB (OK, +0.10 kB vs PR#5)
+- ✅ Type-check: OK (tsc --noEmit)
+- ✅ Tests: 14/17 green (3 skipped) — no regressions
+- ✅ Git: Commit + push a origin/feature/typescript (commit f1f16cb)
+
+### Fórmula Implementada
+```
+iqBonus = base × (iqBonusPercent ÷ 100)
+  where iqBonusPercent = IQ - 14 (if IQ >= 17, else undefined)
+
+total = base + occBonus + iqBonus + perLevelBonus + manualBonus
+total = min(total, 98)
+```
+
+### Ejemplo de Cálculo
+```
+Personaje con IQ=17, Level=1, Skill="Pilot Destroid" (base=20, perLevel=3)
+- iqBonusPercent = 17 - 14 = 3%
+- iqBonus = 20 × (3 ÷ 100) = 0.6 → 0 (floor)
+- total = 20 + 5 (occBonus) + 0 + 0 (perLevelBonus: 3×0) = 25
+
+Personaje con IQ=18, Level=3, mismo skill
+- iqBonusPercent = 18 - 14 = 4%
+- iqBonus = 20 × (4 ÷ 100) = 0.8 → 0 (floor)
+- total = 20 + 5 + 0 + 6 (perLevelBonus: 3×2) = 31
+
+Personaje con IQ=20, Level=5, mismo skill
+- iqBonusPercent = 20 - 14 = 6%
+- iqBonus = 20 × (6 ÷ 100) = 1.2 → 1 (floor)
+- total = 20 + 5 + 1 + 12 (perLevelBonus: 3×4) = 38 ✓
+```
+
+### Impacto
+- **PR#7 (OCC Requirements)**: Procede sin cambios (attribute validation independent)
+- **Summary screen**: Now displays skills with iqBonus applied
+- **Backward compatibility**: Maintained — iqBonusPercent defaults to undefined if not provided
+
+### TODOs Futuros
+- Add iqBonus to SkillManager display (show bonus breakdown)
+- Test IQ bonus impact with high-IQ characters (IQ 18+)
+- Consider OCC-specific skill bonuses (some OCCs get higher per-level advances)
+
+### Notas Técnicas
+- IQ bonus applies at base level calculation, NOT per level
+- Math.floor() used for discrete bonus values (Palladium games)
+- Formula applies to BOTH OCC primary skills AND secondary skills
+- Global application ensures correct skill totals in Summary view
+
+### Próximo: PR#7 (OCC Attribute Requirements Validation)
