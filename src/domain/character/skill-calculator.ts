@@ -20,21 +20,34 @@ import type { Skill, SkillCalculationResult, SkillInstance } from '../skills/ski
  * @param occBonus Bonus otorgado por la OCC
  * @param characterLevel Nivel del personaje (1+)
  * @param manualBonus Bonus manual asignado por el jugador
+ * @param iqBonusPercent Bonus de IQ como porcentaje (IQ - 14) si IQ >= 17
  * @returns Resultado del cálculo completo
+ *
+ * Fórmula: total = base + occBonus + iqBonus + perLevelBonus + manualBonus
+ * donde:
+ *   - iqBonus = base * (iqBonusPercent / 100) [aplicado una sola vez]
+ *   - perLevelBonus = perLevel * (level - 1)
+ *   - total = min(total, 98)
  */
 export function calculateSkillTotal(
   skill: Skill,
   occBonus: number,
   characterLevel: number,
-  manualBonus: number = 0
+  manualBonus: number = 0,
+  iqBonusPercent?: number
 ): SkillCalculationResult {
-  // Punto 7: Si hasPerLevelAdvance es false, no sumar per-level
+  // Per-level advance bonus (si aplica)
   const perLevelBonus = skill.hasPerLevelAdvance
     ? skill.perLevel * Math.max(0, characterLevel - 1)
     : 0;
 
+  // IQ bonus: aplicar porcentaje al base (una sola vez)
+  const iqBonus = iqBonusPercent
+    ? Math.floor(skill.base * (iqBonusPercent / 100))
+    : 0;
+
   // Suma total
-  let total = skill.base + occBonus + perLevelBonus + manualBonus;
+  let total = skill.base + occBonus + iqBonus + perLevelBonus + manualBonus;
 
   // Cap en 98 (reglas Palladium RPG)
   total = Math.min(total, 98);
@@ -44,6 +57,7 @@ export function calculateSkillTotal(
     name_es: skill.name_es,
     base: skill.base,
     occBonus,
+    iqBonus,
     manualBonus,
     perLevelBonus,
     total,
@@ -52,20 +66,22 @@ export function calculateSkillTotal(
 
 /**
  * Calcula todos los skills de un personaje
- * Combina primary y secondary skills
+ * Combina primary y secondary skills, aplicando bonuses de OCC e IQ
  *
  * @param primarySkills Skills primarios con sus IDs tipados
  * @param secondarySkills Skills secundarios con sus IDs tipados
  * @param skillMap Mapa de Skills por ID (SkillId → Skill)
  * @param occBonuses Bonificadores por OCC (keyed by SkillId)
  * @param characterLevel Nivel del personaje
+ * @param iqBonusPercent Bonus de IQ como porcentaje (IQ - 14) si IQ >= 17
  */
 export function calculateCharacterSkills(
   primarySkills: SkillInstance[],
   secondarySkills: SkillInstance[],
   skillMap: Map<string, Skill>, // TODO: cambiar a Map<SkillId, Skill>
   occBonuses: Record<string, number>, // TODO: cambiar a Record<SkillId, number>
-  characterLevel: number
+  characterLevel: number,
+  iqBonusPercent?: number
 ): SkillCalculationResult[] {
   const results: SkillCalculationResult[] = [];
 
@@ -90,7 +106,8 @@ export function calculateCharacterSkills(
       skill,
       occBonus,
       characterLevel,
-      manualBonus
+      manualBonus,
+      iqBonusPercent
     );
 
     results.push(result);

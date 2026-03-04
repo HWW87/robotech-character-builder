@@ -32,10 +32,11 @@ export default function SummaryPage() {
   const otherSkillsChosen = character.occ?.otherSkillsChosen || [];
   const secondarySkills = []; // Legacy field, now empty
   const extraBonuses = character.extraBonuses || {};
+  const iqBonusPercent = character.attributeBonuses?.iqBonusPercent; // Per PR#6: pass IQ bonus to skill calc
 
   const calculated = useMemo(
-    () => calculateSkills(occSkills, secondarySkills, level, extraBonuses),
-    [occSkills, secondarySkills, level, JSON.stringify(extraBonuses)]
+    () => calculateSkills(occSkills, secondarySkills, level, extraBonuses, iqBonusPercent),
+    [occSkills, secondarySkills, level, JSON.stringify(extraBonuses), iqBonusPercent]
   );
 
   return (

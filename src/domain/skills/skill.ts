@@ -34,12 +34,14 @@ export interface SkillInstance {
 /**
  * Resultado del cálculo de un skill
  * Punto 6: output del calculateSkillTotal
+ * IQ bonus: aplicado como porcentaje al base si IQ >= 17
  */
 export interface SkillCalculationResult {
   readonly skillId: SkillId;
   readonly name_es: string;
   readonly base: number;
   readonly occBonus: number;
+  readonly iqBonus: number;
   readonly manualBonus: number;
   readonly perLevelBonus: number;
   readonly total: number;

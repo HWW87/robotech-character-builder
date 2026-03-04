@@ -379,7 +379,7 @@ Agregar entradas por fecha con:
 
 ---
 
-## 2026-03-03 ó PR#2: Attributes Exceptional + IQ Bonus Calculation [COMPLETADO]
+## 2026-03-03 ÔøΩ PR#2: Attributes Exceptional + IQ Bonus Calculation [COMPLETADO]
 
 ### Status
 ? **PR#2 COMPLETADO** - Commit \ea81b6a\ pushed to feature/typescript
@@ -387,9 +387,10 @@ Agregar entradas por fecha con:
 ### Cambios Implementados
 
 #### 1. AttributeForm.jsx - Roll Logic (3d6 + Exceptional)
-- Nueva funciÛn \oll3d6WithExceptional()\ 
+- Nueva funciÔøΩn \
+oll3d6WithExceptional()\ 
 - 3d6 base, si result 16-18: +1d6
-- BotÛn actualizado a "Roll All (3D6 + Exceptional)"
+- BotÔøΩn actualizado a "Roll All (3D6 + Exceptional)"
 
 #### 2. modifiers.js - New Function (IQ Bonus)
 - \calculateAttributeBonuses(attrs)\: {iqBonusPercent?}
@@ -397,7 +398,7 @@ Agregar entradas por fecha con:
 
 #### 3. AttributesPage.jsx - Bonuses Persistence
 - Import \calculateAttributeBonuses\
-- MemoizaciÛn + useEffect ? update("attributeBonuses")
+- MemoizaciÔøΩn + useEffect ? update("attributeBonuses")
 
 ### Validaciones
 - ? Build: 910.58 kB
@@ -405,11 +406,11 @@ Agregar entradas por fecha con:
 - ? Tests: 14/17 green
 - ? Git: Commit + push
 
-### PrÛximo: PR#3 (Vitality Screen)
+### PrÔøΩximo: PR#3 (Vitality Screen)
 
 ---
 
-## 2026-03-04 ó PR#3: Vitality Screen (HP + S.D.C.) [COMPLETADO]
+## 2026-03-04 ÔøΩ PR#3: Vitality Screen (HP + S.D.C.) [COMPLETADO]
 
 ### Status
 ? **PR#3 COMPLETADO** - Commit \ecd23c8\ pushed to feature/typescript
@@ -470,16 +471,16 @@ character.vitality = {
 }
 \\\
 
-### Nota TÈcnica
-- HP c·lculo simple per Robotech spec (PE + 1d6)
+### Nota TÔøΩcnica
+- HP cÔøΩlculo simple per Robotech spec (PE + 1d6)
 - S.D.C. base valores placeholder (pending occ_rdf.json update)
 - Skill bonuses (Boxing, etc.) implementado como input manual (future: load from skills)
 
-### PrÛximo: PR#4 (Equipment Screen)
+### PrÔøΩximo: PR#4 (Equipment Screen)
 
 ---
 
-## 2026-03-04 ó FIX: Pages Updated for CharacterState Structure [HOTFIX]
+## 2026-03-04 ÔøΩ FIX: Pages Updated for CharacterState Structure [HOTFIX]
 
 ### Problem
 Skills page (and other pages) were blank after PR#1 because components were accessing old CharacterState paths.
@@ -516,17 +517,17 @@ Continue with PR#4 (Equipment Screen) as originally planned.
 
 ---
 
-## 2026-03-04 ó FIX: SummaryView CharacterState Structure [HOTFIX #2]
+## 2026-03-04 ÔøΩ FIX: SummaryView CharacterState Structure [HOTFIX #2]
 
 ### Problem
-Summary page tambiÈn estaba en blanco despuÈs del fix anterior.
+Summary page tambiÔøΩn estaba en blanco despuÔøΩs del fix anterior.
 
 ### Root Cause
 SummaryView component estaba accediendo directamente a:
-- \character.name\ ? deberÌa ser \character.personal.name\
-- \character.faction\ ? deberÌa ser \character.personal.faction\
-- \character.occ\ ? deberÌa ser \character.occ.occName\
-- \character.mecha\ ? deberÌa ser \character.mecha.mechaName\
+- \character.name\ ? deberÔøΩa ser \character.personal.name\
+- \character.faction\ ? deberÔøΩa ser \character.personal.faction\
+- \character.occ\ ? deberÔøΩa ser \character.occ.occName\
+- \character.mecha\ ? deberÔøΩa ser \character.mecha.mechaName\
 
 ### Solution Applied
 1. **SummaryView.jsx**: Actualizado a character.personal.*, character.occ.occName, character.mecha.mechaName
@@ -546,7 +547,7 @@ Todos los componentes principales ahora actualizados a nueva estructura Characte
 
 ---
 
-## 2026-03-04 ó PR#4: Equipment Screen (Standard Gear + Wages + Credits) [COMPLETADO]
+## 2026-03-04 ÔøΩ PR#4: Equipment Screen (Standard Gear + Wages + Credits) [COMPLETADO]
 
 ### Status
 ? **PR#4 COMPLETADO** - Commit \ 2160de\ pushed to feature/typescript
@@ -554,16 +555,16 @@ Todos los componentes principales ahora actualizados a nueva estructura Characte
 ### Cambios Implementados
 
 #### 1. equipment.ts (Domain Logic)
-- \getStandardEquipment(occId): string[]\ ó Lista de gear por OCC (placeholder)
-- \calculateMonthlyWages(occId, level): number\ ó Wages por nivel (1-5, 6-10, 11+)
-- \generatePersonalSavings(occId): number\ ó Roll 2d6 ◊ 100 credits
-- \uildEquipmentData(occId, level): EquipmentData\ ó Constructor completo
+- \getStandardEquipment(occId): string[]\ ÔøΩ Lista de gear por OCC (placeholder)
+- \calculateMonthlyWages(occId, level): number\ ÔøΩ Wages por nivel (1-5, 6-10, 11+)
+- \generatePersonalSavings(occId): number\ ÔøΩ Roll 2d6 ÔøΩ 100 credits
+- \uildEquipmentData(occId, level): EquipmentData\ ÔøΩ Constructor completo
 - Placeholder data para 8 OCCs (Destroid, Veritech, Soldier, Specialist, Commando, Technician, Scout, Comms)
 
 #### 2. EquipmentView.jsx (Component)
 - Display standard equipment list (read-only)
 - Display monthly wages con level range indicator
-- Display personal savings con "Re-roll" button (2d6 ◊ 100)
+- Display personal savings con "Re-roll" button (2d6 ÔøΩ 100)
 - Equipment guidelines y notes sobre black market/personal purchases
 
 #### 3. EquipmentPage.jsx (Container)
@@ -579,7 +580,7 @@ Todos los componentes principales ahora actualizados a nueva estructura Characte
 - Route sequence: /skills ? /equipment ? /mecha
 
 #### 5. SkillsPage.jsx
-- Update navegaciÛn: Next ? Equipment (antes era ? Mecha)
+- Update navegaciÔøΩn: Next ? Equipment (antes era ? Mecha)
 
 ### Validaciones
 - ? Build: 923.67 kB (OK, +8.33 kB vs anterior)
@@ -598,15 +599,107 @@ character.equipment = {
 
 ### Impacto
 - **PR#5 (Alignment)**: Procede sin cambios
-- **PR#6 (Skill Math)**: Character.equipment disponible para validaciÛn
+- **PR#6 (Skill Math)**: Character.equipment disponible para validaciÔøΩn
 
 ### TODOs Futuros
 - Mover placeholder data a occ_rdf.json (add \standard_equipment\, \wages\, \savings_formula\ fields)
-- Link skill bonuses (Boxing, etc.) a S.D.C. calculator autom·ticamente
+- Link skill bonuses (Boxing, etc.) a S.D.C. calculator automÔøΩticamente
 
-### Nota TÈcnica
+### Nota TÔøΩcnica
 - Wages formula: 3 brackets (1-5, 6-10, 11+) per manual Robotech
-- Savings roll: 2d6 ◊ 100 (most OCCs), 2d6 ◊ 150 (Commando)
+- Savings roll: 2d6 ÔøΩ 100 (most OCCs), 2d6 ÔøΩ 150 (Commando)
 - Standard equipment cannot be sold (per guidelines)
 
-### PrÛximo: PR#5 (Alignment Selector Screen)
+### PrÔøΩximo: PR#5 (Alignment Selector Screen)
+---
+
+## 2026-03-04 - PR#5: Alignment Selector Screen (9 Alignments, Good/Selfish/Evil) [COMPLETADO]
+
+### Status
+‚úÖ **PR#5 COMPLETADO** - Commit `e17020d` pushed to feature/typescript
+
+### Cambios Implementados
+
+#### 1. AlignmentView.jsx (Component)
+- Presentational component: 9-alignment grid selector
+- Grouped display: Good (2) | Selfish (5) | Evil (2)
+- Each card shows:
+  - Alignment name (EN/ES)
+  - Description (descripcion_es)
+  - Philosophy (filosofia_es)
+  - Tactics (tactica_es)
+  - Tags (es_bueno, es_malvado flags)
+- Selected alignment highlighted with ‚úì
+- Summary display shows:
+  - Selected alignment details
+  - Group label (Good/Selfish/Evil)
+  - Full philosophy and behavior notes
+- PropTypes validation for alignment shape
+
+#### 2. AlignmentPage.jsx (Container)
+- Step 5 en character creation flow
+- Extract character.alignment.alignmentId on load
+- Find matching alignment from alignmentsData.json
+- handleSelect(alignment) logic:
+  - Map es_bueno/es_malvado to AlignmentGroup:
+    - es_bueno === true ‚Üí "Good"
+    - es_malvado === true ‚Üí "Evil"
+    - else ‚Üí "Selfish"
+  - Call update("alignment", {...})
+  - Navigate to /summary on next
+- Navigation: Previous (Mecha) ‚Üê ‚Üí Next (Summary)
+
+#### 3. App.jsx (Routing)
+- Import AlignmentPage
+- Add /alignment route between /mecha and /summary
+- Update nav bar: add "Alignment" link (8th step in 11-step flow)
+- Route sequence: /mecha ‚Üí /alignment ‚Üí /summary
+
+#### 4. MechaPage.jsx
+- Update next button: navigate("/alignment") instead of navigate("/summary")
+
+### Validaciones
+- ‚úÖ Build: 927.83 kB (OK, +4.16 kB vs PR#4)
+- ‚úÖ Type-check: OK (tsc --noEmit)
+- ‚úÖ Tests: 14/17 green (3 skipped)
+- ‚úÖ Git: Commit + push a origin/feature/typescript (commit e17020d)
+
+### Estructura CharacterState
+```
+character.alignment = {
+  alignmentId: AlignmentId,
+  alignmentName: string,
+  alignmentGroup: "Good" | "Selfish" | "Evil"
+}
+```
+
+### Flujo de Creaci√≥n Completado (7/11 pasos)
+1. ‚úÖ Personal Data (Name, Age, Rank)
+2. ‚úÖ Faction (Good/Selfish/Evil ‚Üí NUEDC faction)
+3. ‚úÖ Attributes (3d6+1d6 exceptional, IQ bonus)
+4. ‚úÖ Vitality (HP + SDC)
+5. ‚úÖ OCC Selection (7 OCCs, skill resolution)
+6. ‚úÖ Skills (Primary + Secondary per level)
+7. ‚úÖ Equipment (Standard gear, wages, savings)
+8. ‚úÖ **Mecha Selection** (Destroid/Veritech per faction)
+9. ‚úÖ **Alignment** (9 alignments, Good/Selfish/Evil grouping)
+10. ‚è≥ Summary (Preview all fields)
+11. ‚è≥ Manuals (Reference PDFs)
+
+### Impacto
+- **PR#6 (Skill Math)**: Procede sin cambios (alignment independent)
+- **PR#7 (OCC Requirements)**: Procede sin cambios (alignment independent)
+
+### TODOs Futuros
+- Add alignment_bonuses.json (if alignments provide attribute/skill bonuses)
+- Update Summary.jsx to show alignment selection
+- Add alignment validation (optional: one-time selection per character)
+
+### Nota T√©cnica
+- Alignment selection uses es_bueno/es_malvado flags from alignments.json
+- Good alignments (es_bueno=true): Paladin, Defender
+- Evil alignments (es_malvado=true): Demon, Despot
+- Selfish alignments (neutral): 5 remaining (unprincipled, selfish, anarchist, miscreant, aberrant)
+- No mechanical impact on character stats yet (may be added in future PRs)
+
+### Pr√≥ximo: PR#6 (Skill Math Refactor)

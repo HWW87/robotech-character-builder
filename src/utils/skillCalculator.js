@@ -39,12 +39,15 @@ const getSkillEntry = (name) => {
  * @param {object} occSkills - lista de habilidades del OCC
  * @param {object} secondarySkills - lista de habilidades secundarias
  * @param {number} level - nivel del personaje
+ * @param {object} extraBonuses - object mapping skill name → additional bonus value
+ * @param {number} iqBonusPercent - bonus de IQ como porcentaje (IQ - 14) si IQ >= 17
  */
 export function calculateSkills(
   occSkills = [],
   secondarySkills = [],
   level = 1,
-  extraBonuses = {} // object mapping skill name → additional bonus value
+  extraBonuses = {}, // object mapping skill name → additional bonus value
+  iqBonusPercent = undefined // IQ bonus as percentage if IQ >= 17
 ) {
   const allSkills = [];
   const addSkill = (nameOrId, bonus = 0, isSecondary = false) => {
@@ -72,7 +75,14 @@ export function calculateSkills(
 
     // FIX A: Todas las skills avanzan por nivel (incluyendo secondary)
     const perLevelBonus = perLevel * Math.max(0, level - 1);
-    const total = Math.min(base + bonus + perLevelBonus, 98); // cap en 98
+    
+    // IQ bonus: aplicar porcentaje al base (una sola vez)
+    const iqBonus = iqBonusPercent
+      ? Math.floor(base * (iqBonusPercent / 100))
+      : 0;
+
+    // total = base + occBonus + iqBonus + perLevelBonus, capped at 98
+    const total = Math.min(base + bonus + iqBonus + perLevelBonus, 98);
 
     allSkills.push({
       skillId,
@@ -82,6 +92,7 @@ export function calculateSkills(
       name_en: skill.name_en,
       base,
       bonus,
+      iqBonus,
       perLevel,
       perLevelBonus,
       total,
