@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import PersonalDataPage from "./pages/PersonalDataPage";
 import FactionPage from "./pages/FactionPage";
 import AttributesPage from "./pages/AttributesPage";
+import VitalityPage from "./pages/VitalityPage";
 import OCCPage from "./pages/OCCPage";
 import SkillsPage from "./pages/SkillsPage";
 import MechaPage from "./pages/MechaPage";
@@ -21,6 +22,7 @@ export default function App() {
             <Link to="/" className="hover:text-retroblue">Personal</Link>
             <Link to="/faction" className="hover:text-retroblue">Faction</Link>
             <Link to="/attributes" className="hover:text-retroblue">Attributes</Link>
+            <Link to="/vitality" className="hover:text-retroblue">Vitality</Link>
             <Link to="/occ" className="hover:text-retroblue">O.C.C.</Link>
             <Link to="/skills" className="hover:text-retroblue">Skills</Link>
             <Link to="/mecha" className="hover:text-retroblue">Mecha</Link>
@@ -35,6 +37,7 @@ export default function App() {
             <Route path="/personal" element={<PersonalDataPage />} />
             <Route path="/faction" element={<FactionPage />} />
             <Route path="/attributes" element={<AttributesPage />} />
+            <Route path="/vitality" element={<VitalityPage />} />
             <Route path="/occ" element={<OCCPage />} />
             <Route path="/skills" element={<SkillsPage />} />
             <Route path="/mecha" element={<MechaPage />} />

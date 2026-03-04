@@ -376,3 +376,33 @@ Agregar entradas por fecha con:
 2. Por quÃ©
 3. Impacto en build/tests
 4. Pendientes
+
+---
+
+## 2026-03-03 — PR#2: Attributes Exceptional + IQ Bonus Calculation [COMPLETADO]
+
+### Status
+? **PR#2 COMPLETADO** - Commit \ea81b6a\ pushed to feature/typescript
+
+### Cambios Implementados
+
+#### 1. AttributeForm.jsx - Roll Logic (3d6 + Exceptional)
+- Nueva función \oll3d6WithExceptional()\ 
+- 3d6 base, si result 16-18: +1d6
+- Botón actualizado a "Roll All (3D6 + Exceptional)"
+
+#### 2. modifiers.js - New Function (IQ Bonus)
+- \calculateAttributeBonuses(attrs)\: {iqBonusPercent?}
+- Si IQ >= 17: iqBonusPercent = IQ - 14
+
+#### 3. AttributesPage.jsx - Bonuses Persistence
+- Import \calculateAttributeBonuses\
+- Memoización + useEffect ? update("attributeBonuses")
+
+### Validaciones
+- ? Build: 910.58 kB
+- ? Type-check: OK
+- ? Tests: 14/17 green
+- ? Git: Commit + push
+
+### Próximo: PR#3 (Vitality Screen)
