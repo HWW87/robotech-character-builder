@@ -20,10 +20,27 @@ import skillsRdfData from '../../data/skills_rdf.json';
 /**
  * Singleton para manejar skills
  */
-class SkillRepository {
+export class SkillRepository {
   private static instance: SkillRepository | null = null;
   private skillsById: Map<SkillId, Skill> = new Map();
   private skillsByName: Map<string, SkillId> = new Map(); // normalized name → id
+  private occAliasByNormalizedName: Map<string, string> = new Map([
+    ['weapon systems', 'Weapon Systems (missiles, lasers, etc.)'],
+    ['navigation', 'Navigation (Air, Land, Water)'],
+    ['laser communications', 'Laser'],
+    ['radio scramblers', 'Radio: Scrambler'],
+    ['radio satellite relay', 'Radio: Satellite'],
+    ['computer operations', 'Computer Operation'],
+    ['electrical engineering', 'Electrical Engineer'],
+    ['basic mathematics', 'Mathematics: Basic'],
+    ['advanced mathematics', 'Mathematics: Advanced'],
+    ['medical paramedic', 'Paramedic'],
+    ['mecha mechanic', 'Mecha Mechanics'],
+    ['mecha all destroids', 'Mecha Combat'],
+    ['mecha combat choose two', 'Mecha Combat'],
+    ['veritech fighter', 'Jet'],
+    ['surveillance systems', 'Surveillance'],
+  ]);
 
   private constructor() {
     this.initialize();
@@ -155,7 +172,19 @@ class SkillRepository {
 
     // Normalizar y buscar por nombre
     const normalized = normalizeSkillName(skillIdentifier);
-    return this.skillsByName.get(normalized) || null;
+    const directMatch = this.skillsByName.get(normalized);
+    if (directMatch) {
+      return directMatch;
+    }
+
+    // Resolver aliases frecuentes del dataset OCC al nombre canónico del catálogo de skills
+    const canonicalName = this.occAliasByNormalizedName.get(normalized);
+    if (canonicalName) {
+      const canonicalNormalized = normalizeSkillName(canonicalName);
+      return this.skillsByName.get(canonicalNormalized) || null;
+    }
+
+    return null;
   }
 
   /**

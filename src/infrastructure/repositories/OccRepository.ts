@@ -10,23 +10,23 @@ import type { OccId, SkillId } from '../../domain/shared/types';
 import { createOccId } from '../../domain/shared/types';
 import { validateOccs } from '../../domain/validation/schemas';
 import occRdfData from '../../data/occ_rdf.json';
-import { skillRepository } from './SkillRepository';
+import { SkillRepository, skillRepository } from './SkillRepository';
 
 /**
  * Singleton para manejar OCCs
  */
-class OccRepository {
+export class OccRepository {
   private static instance: OccRepository | null = null;
   private occsById: Map<OccId, OCC> = new Map();
   private occsByName: Map<string, OccId> = new Map(); // name_en → id
 
-  private constructor() {
+  private constructor(private skillRepo: SkillRepository) {
     this.initialize();
   }
 
-  static getInstance(): OccRepository {
+  static getInstance(skillRepo: SkillRepository = skillRepository): OccRepository {
     if (!OccRepository.instance) {
-      OccRepository.instance = new OccRepository();
+      OccRepository.instance = new OccRepository(skillRepo);
     }
     return OccRepository.instance;
   }
@@ -108,15 +108,16 @@ class OccRepository {
       // FIX 2: Extraer skill names y resolver a IDs reales
       const primarySkillIds: SkillId[] = [];
       const primarySkillNames = (occ.occ_skills || [])
-        .map((s: any) => s.skill || '')
+        .filter((s: any) => s?.rule_type !== 'TEXT_ONLY')
+        .map((s: any) => s.skill_id || s.skill || '')
         .filter((s: string) => s.length > 0);
 
       for (const skillName of primarySkillNames) {
-        const resolvedId = skillRepository.resolveSkillId(skillName);
+        const resolvedId = this.skillRepo.resolveSkillId(skillName);
         if (resolvedId) {
           primarySkillIds.push(resolvedId);
         } else {
-          // DEV warning para detectar skills no resueltas
+          // Opcional (DEV): warning para detectar skills no resueltas
           console.warn(`[OCC] Skill no resuelta: ${skillName} en OCC ${occ.name_en}`);
         }
       }
