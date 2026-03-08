@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { HashRouter as Router, Routes, Route, Link } from "react-router-dom";
 import PersonalDataPage from "./pages/PersonalDataPage";
 import FactionPage from "./pages/FactionPage";
 import AttributesPage from "./pages/AttributesPage";

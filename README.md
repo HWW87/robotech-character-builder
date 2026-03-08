@@ -60,6 +60,36 @@ npm run build
 npm run preview
 ```
 
+## 📱 Mobile (Android APK)
+
+Esta app está preparada para empaquetarse en Android con Capacitor.
+Para evitar problemas de deep links en WebView, el proyecto usa `HashRouter`.
+
+### Preparación
+
+```bash
+npm install
+npm run build
+npx cap add android
+```
+
+### Sincronizar web + abrir Android Studio
+
+```bash
+npm run build:mobile
+npx cap open android
+```
+
+### Ejecutar en emulador/dispositivo
+
+```bash
+npm run android:run
+```
+
+Dentro de Android Studio también puedes generar artefactos de distribución:
+- APK: Build > Build Bundle(s) / APK(s) > Build APK(s)
+- AAB: Build > Generate Signed Bundle / APK
+
 ## 📁 Estructura del Proyecto
 
 ```

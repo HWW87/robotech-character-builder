@@ -37,6 +37,12 @@ coverage/
 # Vite
 .vite/
 
+# Android (Capacitor)
+android/.gradle/
+android/local.properties
+android/**/build/
+android/.idea/
+
 # Misc
 *.pem
 *.key

@@ -6,7 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "npm run type-check && vite build",
+    "build:mobile": "vite build && npx cap sync",
     "preview": "vite preview",
+    "android:add": "npx cap add android",
+    "android:open": "npx cap open android",
+    "android:run": "npm run build:mobile && npx cap run android",
+    "sync": "npx cap sync",
     "type-check": "tsc --noEmit",
     "type-check:watch": "tsc --noEmit --watch",
     "lint-types": "tsc --noEmit && echo '✅ All types OK!'",
@@ -16,6 +21,9 @@
     "test:ui": "vitest --ui"
   },
   "dependencies": {
+    "@capacitor/android": "^8.2.0",
+    "@capacitor/cli": "^8.2.0",
+    "@capacitor/core": "^8.2.0",
     "@fontsource/vt323": "^5.2.7",
     "jsdom": "^28.1.0",
     "pdf-parse": "^2.4.5",
