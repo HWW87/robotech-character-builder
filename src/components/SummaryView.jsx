@@ -73,6 +73,11 @@ export default function SummaryView({
     return `(${parts.join(" + ")})`;
   };
 
+  // Get faction config once to avoid multiple calls
+  const factionConfig = character.personal?.faction 
+    ? getFactionById(character.personal.faction) 
+    : null;
+
   return (
     <div className="p-6">
       <RetroCard title="Character Summary">
@@ -116,29 +121,24 @@ export default function SummaryView({
                   </p>
                   <p>
                     <strong>Faction:</strong>{" "}
-                    {character.personal?.faction
-                      ? getFactionById(character.personal.faction)?.name || "—"
-                      : "—"}
+                    {factionConfig?.name || "—"}
                   </p>
                 </div>
               </div>
             </div>
 
             {/* Right: Faction Emblem */}
-            {character.personal?.faction &&
-              getFactionById(character.personal.faction) && (
-                <div className="flex-shrink-0">
-                  <div className="w-10 h-10 rounded border-2 border-gray-400 overflow-hidden bg-white p-1">
-                    <img
-                      src={getFactionById(character.personal.faction)?.image}
-                      alt={`${
-                        getFactionById(character.personal.faction)?.name
-                      } emblem`}
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
+            {factionConfig && (
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 rounded border-2 border-gray-400 overflow-hidden bg-white p-1">
+                  <img
+                    src={factionConfig.image}
+                    alt={`${factionConfig.name} emblem`}
+                    className="w-full h-full object-contain"
+                  />
                 </div>
-              )}
+              </div>
+            )}
           </div>
 
           {/* Previous character details section - now secondary */}
