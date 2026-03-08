@@ -26,6 +26,18 @@ describe('calculateSkills', () => {
     expect(res[0].total).toBe(75);
   });
 
+  it('applies iqBonusPercent one-time to base skill value', () => {
+    const occ = [{ name: 'Pilot Jet', bonus: 5 }];
+    const sec = [];
+    const extra = {};
+    const iqBonusPercent = 10;
+    const res = calculateSkills(occ, sec, 1, extra, iqBonusPercent);
+
+    // base 60 + occ bonus 5 + iqBonus(60*10%=6) = 71
+    expect(res[0].iqBonus).toBe(6);
+    expect(res[0].total).toBe(71);
+  });
+
   it('handles missing skills gracefully', () => {
     const result = calculateSkills([], [], 1);
     expect(result).toEqual([]);
