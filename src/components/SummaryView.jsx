@@ -16,6 +16,25 @@ export default function SummaryView({
   onImport,
   onReset,
 }) {
+  const levelDelta = Math.max(0, (level || 1) - 1);
+
+  const formatBreakdown = (skill, baseWithoutExtra) => {
+    if (skill.missingInCatalog) {
+      return "Missing in catalog";
+    }
+
+    const parts = [`base ${skill.base}`, `bonus ${baseWithoutExtra}`];
+    if (
+      skill.hasPerLevelTerm !== false &&
+      typeof skill.perLevel !== "undefined" &&
+      skill.perLevel !== null &&
+      skill.perLevel > 0
+    ) {
+      parts.push(`lvl${levelDelta}*${skill.perLevel}`);
+    }
+    return `(${parts.join(" + ")})`;
+  };
+
   return (
     <div className="p-6">
       <RetroCard title="Character Summary">
@@ -48,7 +67,8 @@ export default function SummaryView({
             </h3>
             {calculated.length > 0 ? (
               calculated.map((s, i) => {
-                const extra = extraBonuses[s.name] || 0;
+                const skillKey = s.skillId ?? s.skill_id ?? s.name;
+                const extra = extraBonuses[skillKey] || 0;
                 const baseWithoutExtra = s.bonus - extra;
                 return (
                   <div
@@ -57,12 +77,17 @@ export default function SummaryView({
                   >
                     <span>
                       {s.name} ({s.type})
+                      {s.missingInCatalog && (
+                        <span className="ml-2 text-xs text-red-600 font-semibold">
+                          Missing in catalog
+                        </span>
+                      )}
                     </span>
                     <span className="flex items-center gap-2">
                       <span>
-                        {s.total}%{" "}
+                        {s.total !== null && typeof s.total !== "undefined" ? `${s.total}%` : "—"}{" "}
                         <span className="text-xs text-gray-400">
-                          (base {s.base} + {baseWithoutExtra} + lvl×{s.perLevel})
+                          {formatBreakdown(s, baseWithoutExtra)}
                         </span>
                       </span>
                       <input
@@ -70,7 +95,7 @@ export default function SummaryView({
                         className="w-12 text-xs border rounded p-1"
                         value={extra}
                         onChange={(e) =>
-                          onExtraChange(s.name, Number(e.target.value) || 0)
+                          onExtraChange(skillKey, Number(e.target.value) || 0)
                         }
                         title="Additional bonus"
                       />

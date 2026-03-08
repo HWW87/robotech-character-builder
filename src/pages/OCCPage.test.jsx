@@ -103,6 +103,7 @@ describe("OCCPage", () => {
     expect(mockUpdate).toHaveBeenCalledWith("occ", {
       occName: "Veritech Fighter Pilot",
       occId: "Veritech Fighter Pilot",
+      occSkills: [],
     });
     expect(screen.getByText(/Preferred attributes:/i)).toBeTruthy();
     expect(screen.getByText(/PP: preferred 9\+ \(you have 8\)/i)).toBeTruthy();

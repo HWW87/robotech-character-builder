@@ -36,10 +36,15 @@ export class SkillRepository {
     ['advanced mathematics', 'Mathematics: Advanced'],
     ['medical paramedic', 'Paramedic'],
     ['mecha mechanic', 'Mecha Mechanics'],
-    ['mecha all destroids', 'Mecha Combat'],
+    ['mecha all destroids', 'Mecha (Destroid only)'],
     ['mecha combat choose two', 'Mecha Combat'],
     ['veritech fighter', 'Jet'],
     ['surveillance systems', 'Surveillance'],
+    ['automobile', 'Automobile'],
+    ['jet', 'Jet'],
+    ['hand to hand basic', 'Hand to Hand: Basic'],
+    ['hand to hand expert', 'Hand to Hand: Expert'],
+    ['hand to hand martial arts', 'Hand to Hand: Martial Arts'],
   ]);
 
   private constructor() {

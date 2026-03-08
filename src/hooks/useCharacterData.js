@@ -121,8 +121,12 @@ export const useCharacterData = () => {
  * Called on load if localStorage has old format
  */
 function migrateCharacter(legacy) {
-  // If already in new format, return as-is
+  // If already in new format, check if faction needs to be migrated
   if (legacy.personal && legacy.vitality && legacy.equipment) {
+    // Ensure faction is in personal object (may be missing in some versions)
+    if (!legacy.personal.faction && legacy.faction) {
+      legacy.personal.faction = legacy.faction;
+    }
     return legacy;
   }
 
@@ -132,7 +136,7 @@ function migrateCharacter(legacy) {
       name: legacy.name || "",
       age: legacy.age,
       rank: legacy.rank,
-      faction: legacy.faction || "",
+      faction: legacy.faction || legacy.personal?.faction || "",
     },
     level: {
       currentLevel: legacy.level || 1,

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { calculateSkills } from './skillCalculator';
 
 // Use real skill names present in src/data/skills_rdf.json
@@ -38,8 +38,25 @@ describe('calculateSkills', () => {
     expect(res[0].total).toBe(71);
   });
 
-  it('handles missing skills gracefully', () => {
-    const result = calculateSkills([], [], 1);
-    expect(result).toEqual([]);
+  it('flags missing skills and emits warning instead of silently defaulting', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const occ = [{ name: 'Skill That Does Not Exist', bonus: 15 }];
+    const result = calculateSkills(occ, [], 1);
+
+    expect(result).toHaveLength(1);
+    expect(result[0]).toEqual(
+      expect.objectContaining({
+        name: 'Skill That Does Not Exist',
+        missingInCatalog: true,
+        base: null,
+        perLevel: undefined,
+        total: null,
+        bonus: 15,
+      })
+    );
+    expect(warnSpy).toHaveBeenCalled();
+
+    warnSpy.mockRestore();
   });
 });
