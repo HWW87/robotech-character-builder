@@ -47,7 +47,7 @@ export default function AttributesPage() {
 
   const handleNext = () => {
     if (error) return;
-    navigate("/occ");
+    navigate("/vitality");
   };
 
   return (

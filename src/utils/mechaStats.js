@@ -776,6 +776,10 @@ import {
 } from '../infrastructure/repositories/MechaRepository';
 
 export function getMechaByName(name) {
+  if (!name || !String(name).trim()) {
+    return null;
+  }
+
   // Usar searchMechasByName que hace fuzzy matching
   const results = searchMechasByName(name);
   return results.length > 0 ? results[0] : null;
