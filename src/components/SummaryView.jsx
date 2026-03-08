@@ -18,12 +18,12 @@ export default function SummaryView({
 }) {
   const levelDelta = Math.max(0, (level || 1) - 1);
 
-  const formatBreakdown = (skill) => {
+  const formatBreakdown = (skill, baseWithoutExtra) => {
     if (skill.missingInCatalog) {
       return "Missing in catalog";
     }
 
-    const parts = [`base ${skill.base}`, `bonus ${skill.bonus}`];
+    const parts = [`base ${skill.base}`, `bonus ${baseWithoutExtra}`];
     if (
       skill.hasPerLevelTerm !== false &&
       typeof skill.perLevel !== "undefined" &&
@@ -67,8 +67,9 @@ export default function SummaryView({
             </h3>
             {calculated.length > 0 ? (
               calculated.map((s, i) => {
-                const skillKey = s.skill_id ?? s.name;
+                const skillKey = s.skillId ?? s.skill_id ?? s.name;
                 const extra = extraBonuses[skillKey] || 0;
+                const baseWithoutExtra = s.bonus - extra;
                 return (
                   <div
                     key={i}
@@ -86,7 +87,7 @@ export default function SummaryView({
                       <span>
                         {s.total !== null && typeof s.total !== "undefined" ? `${s.total}%` : "—"}{" "}
                         <span className="text-xs text-gray-400">
-                          {formatBreakdown(s)}
+                          {formatBreakdown(s, baseWithoutExtra)}
                         </span>
                       </span>
                       <input
