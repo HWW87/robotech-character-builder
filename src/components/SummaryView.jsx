@@ -18,13 +18,18 @@ export default function SummaryView({
 }) {
   const levelDelta = Math.max(0, (level || 1) - 1);
 
-  const formatBreakdown = (skill, baseWithoutExtra) => {
+  const formatBreakdown = (skill) => {
     if (skill.missingInCatalog) {
       return "Missing in catalog";
     }
 
-    const parts = [`base ${skill.base}`, `${baseWithoutExtra}`];
-    if (skill.hasPerLevelTerm !== false && typeof skill.perLevel !== "undefined" && skill.perLevel !== null) {
+    const parts = [`base ${skill.base}`, `bonus ${skill.bonus}`];
+    if (
+      skill.hasPerLevelTerm !== false &&
+      typeof skill.perLevel !== "undefined" &&
+      skill.perLevel !== null &&
+      skill.perLevel > 0
+    ) {
       parts.push(`lvl${levelDelta}*${skill.perLevel}`);
     }
     return `(${parts.join(" + ")})`;
@@ -62,8 +67,8 @@ export default function SummaryView({
             </h3>
             {calculated.length > 0 ? (
               calculated.map((s, i) => {
-                const extra = extraBonuses[s.name] || 0;
-                const baseWithoutExtra = s.bonus - extra;
+                const skillKey = s.skill_id ?? s.name;
+                const extra = extraBonuses[skillKey] || 0;
                 return (
                   <div
                     key={i}
@@ -81,7 +86,7 @@ export default function SummaryView({
                       <span>
                         {s.total !== null && typeof s.total !== "undefined" ? `${s.total}%` : "—"}{" "}
                         <span className="text-xs text-gray-400">
-                          {formatBreakdown(s, baseWithoutExtra)}
+                          {formatBreakdown(s)}
                         </span>
                       </span>
                       <input
@@ -89,7 +94,7 @@ export default function SummaryView({
                         className="w-12 text-xs border rounded p-1"
                         value={extra}
                         onChange={(e) =>
-                          onExtraChange(s.name, Number(e.target.value) || 0)
+                          onExtraChange(skillKey, Number(e.target.value) || 0)
                         }
                         title="Additional bonus"
                       />

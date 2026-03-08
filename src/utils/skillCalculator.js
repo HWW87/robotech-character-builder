@@ -54,6 +54,7 @@ export function calculateSkills(
   const addMissingSkill = (nameOrId, bonus = 0, isSecondary = false, reason = "Missing in catalog") => {
     allSkills.push({
       skillId: null,
+      skill_id: null,
       id: null,
       name: nameOrId,
       name_es: nameOrId,
@@ -88,7 +89,7 @@ export function calculateSkills(
     }
 
     // Incorporar cualquier bonus manual "varios"
-    const extra = extraBonuses[nameOrId] || extraBonuses[skill.name_es] || 0;
+    const extra = extraBonuses[skillId] || extraBonuses[nameOrId] || extraBonuses[skill.name_es] || 0;
     bonus += extra;
 
     // Usar los datos de dominio en lugar del JSON legacy
@@ -110,6 +111,7 @@ export function calculateSkills(
 
     allSkills.push({
       skillId,
+      skill_id: skillId,
       id: skillId,
       name: skill.name_es,
       name_es: skill.name_es,
