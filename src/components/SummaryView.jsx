@@ -74,9 +74,11 @@ export default function SummaryView({
   };
 
   // Get faction config once to avoid multiple calls
-  const factionConfig = character.personal?.faction 
-    ? getFactionById(character.personal.faction) 
-    : null;
+  const factionConfig = React.useMemo(() => {
+    return character.personal?.faction 
+      ? getFactionById(character.personal.faction) 
+      : null;
+  }, [character.personal?.faction]);
 
   return (
     <div className="p-6">
@@ -117,7 +119,8 @@ export default function SummaryView({
                 </div>
                 <div>
                   <p>
-                    <strong>Alignment:</strong> {character.alignment || "—"}
+                    <strong>Alignment:</strong>{" "}
+                    {character.alignment?.alignmentName || character.alignment || "—"}
                   </p>
                   <p>
                     <strong>Faction:</strong>{" "}
