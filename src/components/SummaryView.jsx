@@ -1,5 +1,6 @@
 import React from "react";
 import RetroCard from "./RetroCard";
+import { getFactionById } from "../data/factions";
 
 /**
  * Componente presentacional puro para mostrar resumen de personaje.
@@ -44,9 +45,26 @@ export default function SummaryView({
               <p>
                 <strong>Name:</strong> {character.personal?.name || "—"}
               </p>
-              <p>
-                <strong>Faction:</strong> {character.personal?.faction || "—"}
-              </p>
+              <div className="flex items-center gap-2 mb-2">
+                <div>
+                  <strong>Faction:</strong>
+                  {character.personal?.faction ? (
+                    <>
+                      {" "}
+                      {getFactionById(character.personal.faction)?.name || "—"}
+                    </>
+                  ) : (
+                    " —"
+                  )}
+                </div>
+                {character.personal?.faction && getFactionById(character.personal.faction) && (
+                  <img
+                    src={getFactionById(character.personal.faction)?.image}
+                    alt={getFactionById(character.personal.faction)?.name}
+                    className="w-12 h-12 rounded object-cover border border-gray-300"
+                  />
+                )}
+              </div>
               <p>
                 <strong>O.C.C.:</strong> {character.occ?.occName || "—"}
               </p>
