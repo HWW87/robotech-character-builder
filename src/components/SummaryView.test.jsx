@@ -4,7 +4,12 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import SummaryView from './SummaryView';
 
-const sampleChar = { name: 'Test', faction: 'RDF', occ: 'Destroid Pilot' };
+// Updated to match new CharacterState structure (per PR#1)
+const sampleChar = { 
+  personal: { name: 'Test', faction: 'RDF' },
+  occ: { occName: 'Destroid Pilot' },
+  mecha: { mechaName: 'VF-1A Valkyrie' }
+};
 const calculated = [
   { name: 'Pilot Jet', type: 'OCC', total: 80, base: 60, bonus: 20, perLevel: 3 },
 ];

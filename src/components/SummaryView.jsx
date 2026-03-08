@@ -23,13 +23,13 @@ export default function SummaryView({
           <div className="grid grid-cols-2 mb-4">
             <div>
               <p>
-                <strong>Name:</strong> {character.name || "—"}
+                <strong>Name:</strong> {character.personal?.name || "—"}
               </p>
               <p>
-                <strong>Faction:</strong> {character.faction || "—"}
+                <strong>Faction:</strong> {character.personal?.faction || "—"}
               </p>
               <p>
-                <strong>O.C.C.:</strong> {character.occ || "—"}
+                <strong>O.C.C.:</strong> {character.occ?.occName || "—"}
               </p>
             </div>
             <div>
@@ -37,7 +37,7 @@ export default function SummaryView({
                 <strong>Level:</strong> {level}
               </p>
               <p>
-                <strong>Mecha:</strong> {character.mecha || "—"}
+                <strong>Mecha:</strong> {character.mecha?.mechaName || "—"}
               </p>
             </div>
           </div>

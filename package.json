@@ -5,10 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run type-check && vite build",
     "preview": "vite preview",
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "tsc --noEmit --watch",
+    "lint-types": "tsc --noEmit && echo '✅ All types OK!'",
     "preprocess:manuals": "node scripts/convert_manuals.js",
-    "test": "vitest"
+    "test": "vitest",
+    "test:run": "vitest --run",
+    "test:ui": "vitest --ui"
   },
   "dependencies": {
     "@fontsource/vt323": "^5.2.7",
@@ -21,20 +26,22 @@
     "react-router-dom": "^6.22.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.15",
-    "@types/react-dom": "^18.2.7",
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@types/node": "^25.3.3",
+    "@types/react": "^18.3.28",
+    "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^5.1.2",
     "autoprefixer": "^10.4.23",
     "postcss": "^8.5.6",
+    "prop-types": "^15.8.1",
     "tailwindcss": "^3.4.19",
-    "vite": "^7.3.1"
-    ,"vitest": "^0.28.0",
-    "@testing-library/react": "^14.0.0",
-    "@testing-library/jest-dom": "^6.0.0",
-    "@testing-library/react-hooks": "^8.0.1",
-    "prop-types": "^15.8.1"
-  }
-  ,
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vitest": "^0.28.0",
+    "zod": "^4.3.6"
+  },
   "vitest": {
     "globals": true,
     "environment": "jsdom",

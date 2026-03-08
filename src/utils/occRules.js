@@ -1,53 +1,50 @@
 /**
  * Utilities for working with OCC definitions stored in JSON.
- * The source file `occ_rdf.json` contains an array of OCCs each with
- * an optional `factions` list indicating which faction(s) can choose it.
+ * ⚠️ DEPRECATED: Use OccRepository desde infrastructure/repositories
+ *
+ * La mayoría de estas funciones ahora son wrappers sobre OccRepository
+ * para mantener compatibilidad con código antiguo.
  */
+import { getAllOccs, getOccById, resolveOccId } from "../infrastructure/repositories/OccRepository";
+import { getAllSkills, resolveSkillId } from "../infrastructure/repositories/SkillRepository";
 import occData from "../data/occ_rdf.json";
 import skillsData from "../data/skills_rdf.json";
 
 /**
- * Return the list of OCC display names.  Faction filtering is currently
- * ignored because the JSON doesn't include faction data; assume all OCCs
- * are available to the selected faction until the data is extended.
+ * Return the list of OCC display names by faction.
+ * @deprecated Usar getOccsByFaction() de OccRepository
  */
 export const getOccByFaction = (faction) => {
-  if (!occData?.occs) return [];
-  if (!faction) return occData.occs.map((o) => o.name_en);
-  // return only those occs whose factions list includes the given faction
-  return occData.occs
-    .filter(
-      (o) =>
-        !o.factions ||
-        o.factions.length === 0 ||
-        o.factions.includes(faction) ||
-        o.factions.includes("Any")
-    )
-    .map((o) => o.name_en);
+  const occs = faction 
+    ? getAllOccs().filter(o => !o.factions || o.factions.length === 0 || o.factions.includes(faction) || o.factions.includes("Any"))
+    : getAllOccs();
+  return occs.map(o => o.name_en);
 };
 
 /**
  * Look up the full definition object for an OCC by its display name (English).
+ * @deprecated Usar getOccById() de OccRepository
  */
 export const getOccDetails = (name) => {
-  if (!occData?.occs) return null;
-  return occData.occs.find((o) => o.name_en === name) || null;
+  const occ = getAllOccs().find(o => o.name_en === name);
+  return occ || null;
 };
 
-// legacy helpers left for backwards compatibility – kept for now but
-// the app no longer relies on these.
+/**
+ * Get OCC details by ID (more efficient)
+ */
+export const getOccDetailsById = (occId) => {
+  return getOccById(occId);
+};
+
+// legacy helpers left for backwards compatibility
 export const getSkillsByFaction = (faction, parsedData) => {
   return getOccByFaction(faction).map((name) => {
     const occ = getOccDetails(name);
-    return occ?.occ_skills?.map((s) => s.skill) || [];
+    return occ?.primarySkills || [];
   }).flat();
 };
-// -----------------------------------------------------------------------------
-// New helpers for skill filtering and limits
 
-/**
- * Return a flat list of every skill name defined in skills_rdf.json.
- */
 // build a simple skill -> category lookup from the data file
 const skillToCategory = {};
 if (skillsData.skills_by_category) {
@@ -67,59 +64,52 @@ const normalizeSkillName = (name) => {
 };
 
 export const getAllSkillNames = () => {
-  if (!skillsData.skills_by_category) return [];
-  return Object.values(skillsData.skills_by_category).flatMap((cat) =>
-    Object.keys(cat)
-  );
+  return getAllSkills().map(s => s.name_es);
 };
 
 /**
  * Given an OCC name, return the list of extra skills the player may choose from
  * when selecting "other skills." The result excludes skills already granted
  * by the OCC and applies simple category filtering based on allowed_categories.
+ * @deprecated Usar getOccDetails() + getAllSkills() de los repositories
  */
 export const getAllowedSecondarySkills = (occName) => {
   const occ = getOccDetails(occName);
   if (!occ) return [];
 
-  const allSkills = getAllSkillNames();
+  const allSkills = getAllSkills();
 
-  // remove OCC-provided skills, normalizing both lists
-  const primary = occ.occ_skills?.map((s) => normalizeSkillName(s.skill)) || [];
+  // Convertir nombres de skills primarios a IDs para comparación
+  const primarySkillIds = new Set();
+  for (const skillName of (occ.primarySkills || [])) {
+    const skillId = resolveSkillId(skillName);
+    if (skillId) {
+      primarySkillIds.add(skillId);
+    }
+  }
+
+  // Filtrar skills: remover OCC-provided skills
   let allowed = allSkills.filter((s) => {
-    return !primary.includes(normalizeSkillName(s));
+    return !primarySkillIds.has(s.id);
   });
 
-  const categories = occ.other_skills?.allowed_categories || [];
-  if (categories.length > 0) {
-    // if any category entry allows "Any" we don't further restrict
-    if (
-      categories.some(
-        (c) => c.restriction && c.restriction.toLowerCase().includes("any")
-      )
-    ) {
-      return allowed;
-    }
-
+  const allowedCategories = occ.secondarySkillsAllowed?.categories || [];
+  if (allowedCategories.length > 0) {
+    // Filter by allowed categories
     allowed = allowed.filter((skill) => {
-      const skillCat = skillToCategory[skill];
-      if (!skillCat) return false;
-      return categories.some(
-        (c) => c.category.toLowerCase() === skillCat.toLowerCase()
-      );
+      return allowedCategories.includes(skill.category);
     });
   }
 
-  return allowed;
+  return allowed.map(s => s.name_es);
 };
 
 /**
  * How many other skills may be selected for this OCC? Falls back to Infinity.
+ * @deprecated Usar OCC object directamente desde los repositories
  */
 export const getOtherSkillLimit = (occName) => {
   const occ = getOccDetails(occName);
   if (!occ) return Infinity;
-  return occ.other_skills?.select_count ?? Infinity;
+  return occ.secondarySkillsAllowed?.count ?? Infinity;
 };
-
-// -----------------------------------------------------------------------------

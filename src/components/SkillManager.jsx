@@ -38,8 +38,42 @@ export default function SkillManager({ faction, occ, skills, onChange }) {
     onChange(updated);
   };
 
+  const autoFillSkills = () => {
+    // Auto-seleccionar las primeras skills hasta el límite
+    const autoSelected = available.slice(0, Math.min(limit, available.length));
+    setSelected(autoSelected);
+    onChange(autoSelected);
+  };
+
+  const clearSkills = () => {
+    setSelected([]);
+    onChange([]);
+  };
+
+  const remaining = Math.max(0, limit - selected.length);
+
   return (
     <RetroCard title="Skill Selection">
+      <div className="mb-4 flex gap-2">
+        <button 
+          onClick={autoFillSkills}
+          disabled={!occ || limit === Infinity}
+          className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+        >
+          ⚡ Auto-Fill Skills
+        </button>
+        <button 
+          onClick={clearSkills}
+          className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+        >
+          🗑️ Clear All
+        </button>
+        {limit !== Infinity && (
+          <span className="ml-auto self-center text-sm font-semibold">
+            Remaining slots: {remaining} / {limit}
+          </span>
+        )}
+      </div>
       <div className="flex gap-4">
         <div className="w-1/2">
           <h3 className="font-semibold mb-2">Available Skills</h3>
@@ -62,11 +96,7 @@ export default function SkillManager({ faction, occ, skills, onChange }) {
               </li>
             ))}
           </ul>
-          {limit !== Infinity && (
-            <p className="mt-2 text-sm">
-              Remaining slots: {limit - selected.length} / {limit}
-            </p>
-          )}
+
         </div>
       </div>
     </RetroCard>

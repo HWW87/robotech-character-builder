@@ -7,13 +7,24 @@ export default function AttributeForm({ attributes, onChange }) {
     onChange({ ...attributes, [key]: value });
   };
 
-  const roll = () => Math.floor(Math.random() * 6 + 1) +
-                      Math.floor(Math.random() * 6 + 1) +
-                      Math.floor(Math.random() * 6 + 1);
+  /**
+   * Roll 3d6. If result is 16-18, add 1d6 (exceptional attribute per Robotech spec)
+   */
+  const roll3d6WithExceptional = () => {
+    const base = Math.floor(Math.random() * 6 + 1) +
+                 Math.floor(Math.random() * 6 + 1) +
+                 Math.floor(Math.random() * 6 + 1);
+    
+    if (base >= 16 && base <= 18) {
+      const bonus = Math.floor(Math.random() * 6 + 1);
+      return base + bonus;
+    }
+    return base;
+  };
 
   const rollAll = () => {
     const newAttrs = {};
-    Object.keys(attributes).forEach(k => newAttrs[k] = roll());
+    Object.keys(attributes).forEach(k => newAttrs[k] = roll3d6WithExceptional());
     onChange(newAttrs);
   };
 
@@ -31,7 +42,7 @@ export default function AttributeForm({ attributes, onChange }) {
           </div>
         ))}
       </div>
-      <button onClick={rollAll}>🎲 Roll All (3D6)</button>
+      <button onClick={rollAll}>🎲 Roll All (3D6 + Exceptional)</button>
     </RetroCard>
   );
 }

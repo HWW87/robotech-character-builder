@@ -1,3 +1,12 @@
+/**
+ * Legacy skill calculator
+ * ⚠️ DEPRECATED: Use SkillRepository y calculateCharacterSkills() desde domain layer
+ *
+ * Esta función se mantiene para compatibilidad con código antiguo
+ * Migración: ver infrastructure/repositories/SkillRepository.ts
+ */
+
+import { resolveSkillId, getSkillById, getAllSkills } from '../infrastructure/repositories/SkillRepository';
 import skillsData from "../data/skills_rdf.json";
 
 // helper to flatten skills_by_category when needed, with basic normalization
@@ -26,46 +35,82 @@ const getSkillEntry = (name) => {
 
 /**
  * Combina OCC skills, Secondary skills y calcula valores finales.
+ * @deprecated Usar calculateCharacterSkills() del domain layer en su lugar
  * @param {object} occSkills - lista de habilidades del OCC
  * @param {object} secondarySkills - lista de habilidades secundarias
  * @param {number} level - nivel del personaje
+ * @param {object} extraBonuses - object mapping skill name → additional bonus value
+ * @param {number} iqBonusPercent - bonus de IQ como porcentaje (IQ - 14) si IQ >= 17
  */
 export function calculateSkills(
   occSkills = [],
   secondarySkills = [],
   level = 1,
-  extraBonuses = {} // object mapping skill name → additional bonus value
+  extraBonuses = {}, // object mapping skill name → additional bonus value
+  iqBonusPercent = undefined // IQ bonus as percentage if IQ >= 17
 ) {
   const allSkills = [];
-  const addSkill = (name, bonus = 0, isSecondary = false) => {
-    // incorporate any manual "varios" bonus
-    const extra = extraBonuses[name] || 0;
-    bonus += extra;
-    let base = 0;
-    let perLevel = 0;
-
-    // search flattened data structure
-    const entry = getSkillEntry(name);
-    if (entry) {
-      base = entry.base || 0;
-      perLevel = entry.per_level || 0;
+  const addSkill = (nameOrId, bonus = 0, isSecondary = false) => {
+    // Intentar resolver el ID
+    const skillId = resolveSkillId(nameOrId);
+    
+    if (!skillId) {
+      console.warn(`⚠️ No se pudo resolver skill: ${nameOrId}`);
+      return;
     }
 
-    const total = Math.round(base + bonus + (isSecondary ? 0 : (perLevel * (level - 1))));
-    allSkills.push({ name, base, bonus, perLevel, total, type: isSecondary ? "Secondary" : "OCC" });
+    const skill = getSkillById(skillId);
+    if (!skill) {
+      console.warn(`⚠️ Skill no encontrado después de resolver ID: ${skillId}`);
+      return;
+    }
+
+    // Incorporar cualquier bonus manual "varios"
+    const extra = extraBonuses[nameOrId] || extraBonuses[skill.name_es] || 0;
+    bonus += extra;
+
+    // Usar los datos de dominio en lugar del JSON legacy
+    const base = skill.base || 0;
+    const perLevel = skill.perLevel || 0;
+
+    // FIX A: Todas las skills avanzan por nivel (incluyendo secondary)
+    const perLevelBonus = perLevel * Math.max(0, level - 1);
+    
+    // IQ bonus: aplicar porcentaje al base (una sola vez)
+    const iqBonus = iqBonusPercent
+      ? Math.floor(base * (iqBonusPercent / 100))
+      : 0;
+
+    // total = base + occBonus + iqBonus + perLevelBonus, capped at 98
+    const total = Math.min(base + bonus + iqBonus + perLevelBonus, 98);
+
+    allSkills.push({
+      skillId,
+      id: skillId,
+      name: skill.name_es,
+      name_es: skill.name_es,
+      name_en: skill.name_en,
+      base,
+      bonus,
+      iqBonus,
+      perLevel,
+      perLevelBonus,
+      total,
+      type: isSecondary ? "Secondary" : "OCC"
+    });
   };
 
   // Accept either objects ({ name, bonus }) or plain string names
   occSkills.forEach((s) => {
     if (!s) return;
     if (typeof s === "string") addSkill(s, 0, false);
-    else addSkill(s.name || s.skill, s.bonus || 0, false);
+    else addSkill(s.name || s.skill || s.skillId, s.bonus || 0, false);
   });
 
   secondarySkills.forEach((s) => {
     if (!s) return;
     if (typeof s === "string") addSkill(s, 0, true);
-    else addSkill(s.name || s.skill, 0, true);
+    else addSkill(s.name || s.skill || s.skillId, 0, true);
   });
 
   return allSkills;

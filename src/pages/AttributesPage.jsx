@@ -2,7 +2,7 @@ import React, { useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AttributesView from "../components/AttributesView";
 import { useCharacterData } from "../hooks/useCharacterData";
-import { calcModifiers } from "../utils/modifiers";
+import { calcModifiers, calculateAttributeBonuses } from "../utils/modifiers";
 
 /**
  * Container component para Attributes Page.
@@ -16,6 +16,9 @@ export default function AttributesPage() {
 
   // Memoizar los modificadores para evitar recálculos innecesarios
   const mods = useMemo(() => calcModifiers(attrs), [attrs]);
+  
+  // Calcular bonificaciones de atributos (IQ bonus, etc.) - PR#2
+  const bonuses = useMemo(() => calculateAttributeBonuses(attrs), [attrs]);
 
   const [error, setError] = React.useState("");
 
@@ -34,10 +37,17 @@ export default function AttributesPage() {
       update("modifiers", mods);
     }
   }, [mods, update]);
+  
+  // Update attributeBonuses (per PR#2: IQ bonus for skills)
+  useEffect(() => {
+    if (Object.keys(bonuses).length > 0) {
+      update("attributeBonuses", bonuses);
+    }
+  }, [bonuses, update]);
 
   const handleNext = () => {
     if (error) return;
-    navigate("/occ");
+    navigate("/vitality");
   };
 
   return (

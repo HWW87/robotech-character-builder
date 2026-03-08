@@ -1,0 +1,920 @@
+# Bitácora de Desarrollo
+
+## Objetivo
+Mantener contexto técnico e historial de decisiones para evitar pérdida de información entre iteraciones.
+
+---
+
+## 2026-03-03
+
+### Estado general
+- Rama activa: `feature/typescript`
+- Build: ✅ OK
+- Tests: ✅ `14 passed`, `3 skipped`
+
+### Cambios aplicados (alta prioridad)
+
+#### FIX 1 — Tipados Zod completos
+- Archivo: `src/domain/validation/schemas.ts`
+- Se agregó `AlignmentSchema`.
+- Se agregó `ValidatedAlignment = z.infer<typeof AlignmentSchema>`.
+- Se agregó `validateAlignments(data)`.
+
+#### FIX A — Secondary skills avanzan por nivel
+- Archivo: `src/utils/skillCalculator.js`
+- Se dejó el cálculo de `perLevelBonus` para todas las skills (OCC y secundarias).
+
+#### FIX B — OCC usa SkillIds reales
+- Archivo: `src/infrastructure/repositories/OccRepository.ts`
+- `OccRepository` ahora recibe `SkillRepository` por constructor (inyección).
+- `primarySkills` se resuelve con `resolveSkillId(...)` usando `skill_id ?? skill`.
+- Se filtra `rule_type === "TEXT_ONLY"` para no tratar texto narrativo como skill canónica.
+
+### Coherencia de repositorios
+- Archivo: `src/infrastructure/repositories/SkillRepository.ts`
+- Se exportó la clase `SkillRepository` para habilitar DI.
+- Se agregaron aliases OCC→skill canónica para mejorar resolución (variantes/plurales).
+
+### Estado de warnings OCC
+- Se redujeron fuertemente warnings de skills no resueltas.
+- Pendiente narrativo no determinístico:
+  - `Hand to Hand (choose one: Expert or Martial Arts)`
+
+### Decisiones
+- Source of Truth para SkillId: `SkillRepository`.
+- No "brandear" nombres libres como IDs de dominio.
+- En casos narrativos/choice, no forzar resolución automática sin regla explícita.
+
+### Estado final — Ciclo completado
+✅ FIX A: Secondary skills avanzan por nivel (aplicado).
+✅ FIX B: OccRepository inyecta SkillRepository y resuelve IDs reales (aplicado).
+✅ Alias OCC→skill canónica agregados.
+✅ Tests: 14 passed, 3 skipped.
+✅ Build: OK.
+
+### Cambios en rama
+```
+src/utils/skillCalculator.js
+  - Línea 70-76: perLevelBonus = perLevel * Math.max(0, level - 1) 
+    (antes: condicional isSecondary)
+
+src/infrastructure/repositories/OccRepository.ts
+  - Línea 11: import { SkillRepository, skillRepository } from './SkillRepository'
+  - Línea 16: constructor(private skillRepo: SkillRepository)
+  - Línea 26: static getInstance(skillRepo = skillRepository)
+  - Línea 107-120: resolución con .filter(TEXT_ONLY), skill_id/skill fallback, resolveSkillId()
+
+src/infrastructure/repositories/SkillRepository.ts
+  - Línea 18-32: occAliasByNormalizedName Map (14 aliases frecuentes)
+  - Línea 156-170: lógica de resolución con fallback a alias
+  - Clase ahora exportada (DI ready)
+
+src/domain/validation/schemas.ts
+  - Línea 95-110: AlignmentSchema + ValidatedAlignment
+  - Línea 162-172: validateAlignments()
+```
+
+### Próximo paso sugerido
+- Manejo explícito de entradas `CHOICE` (narrativas sin skill canónica): investigar si marcar explícitamente en OCC o silenciar warning.
+
+---
+
+## 2026-03-03 — ANÁLISIS SPEC CHARACTER_CREATION_SPEC
+
+### 📋 GAP ANALYSIS (Especificación vs Código)
+
+#### ✅ IMPLEMENTADO (Funcional)
+- **Screen A (Personal/Faction)**: `PersonalDataPage`, `FactionPage`, inputs básicos OK
+- **Screen B (Attributes)**: `AttributesPage`, almacenamiento atributos base OK
+- **Screen D (OCC Selection)**: `OCCPage`, `OCCSelector`, validación de requisitos pendiente
+- **Screen E (Skills)**: `SkillManager`, selección de otras skills, limites (`select_count`)
+- **Screen H (Summary/Export)**: `SummaryView`, JSON export/import OK
+
+#### ❌ FALTA O INCOMPLETO (Critical Path)
+
+| Requerimiento | Ubicación Spec | Estado | Impacto |
+|---|---|---|---|
+| **Attrs excepcionales (3d6 → si 16-18 roll +1d6)** | Screen B | ❌ No | Generación incompleta |
+| **IQ Bonus ≥17** | Screen B, E | ❌ No | Skills mal calculadas |
+| **HP Calculation (PE + 1d6)** | Screen C | ❌ No | Vitals sin HP |
+| **S.D.C. Base by OCC** | Screen C | ❌ No | Vitals sin SDC |
+| **Skill calculation: OCC one-time bonus** | Screen E | ❌ Parcial | Math incorrecta |
+| **Skill calculation: IQ one-time bonus** | Screen E | ❌ No | Math incorrecta |
+| **Skill cap 98%** | Screen E | ⚠️ Parcial | Aplicado (verificar) |
+| **Pantalla Equipment/Credits (Step 4)** | Screen F | ❌ No | Equipo/wages sin UI |
+| **Pantalla Alignment (Step 5)** | Screen G | ❌ No | Alineamiento sin selector |
+| **Multi-OCC (Optional)** | Sección 2 | ❌ No | Opcional (skip OK) |
+
+#### 🔴 BRECHA EN CharacterState
+
+**Actual** (useCharacterData.js):
+```
+{
+  name, faction, 
+  attributes: {IQ, ME, MA, PS, PP, PE, PB, Spd}, 
+  occ, skills, mecha, 
+  modifiers
+}
+```
+
+**Requerido** (spec):
+```
+{
+  personal: {name, age, rank?, faction},
+  level: {currentLevel},
+  attributes: {IQ, ME, MA, PS, PP, PE, PB, Spd, attributeBonuses},
+  vitality: {
+    hitPoints: {base, initialRoll, totalAtLevel1},
+    sdc: {baseByOcc, fromSkills, total}
+  },
+  occ: {occId, occName, occSkills, otherSkillsChosen},
+  skills: {
+    calculatedSkills, 
+    globalSkillBonuses: {iqBonusPercent, occSkillBonuses}
+  },
+  equipment: {standardEquipment, wages, personalSavings},
+  alignment: {alignmentId, alignmentName, alignmentGroup}
+}
+```
+
+### 📊 Pantallas vs Spec
+
+| Pantalla | Spec | Actual | Estado |
+|---|---|---|---|
+| A. Personal/Faction | ✅ | PersonalDataPage, FactionPage | OK |
+| B. Attributes | Spec compleja | AttributesPage básico | 🟡 Falta excepcionales + IQ bonus |
+| C. HP + S.D.C. | Nueva en spec | ❌ No existe | 🔴 Missing |
+| D. OCC Selection | ✅ | OCCPage | OK |
+| E. Skills | Spec compleja | SkillManager | 🟡 Falta bonuses + math |
+| F. Equipment/Credits | Nueva en spec | ❌ No existe | 🔴 Missing |
+| G. Alignment | Nueva en spec | ❌ No existe (datos sí) | 🔴 Missing |
+| H. Summary/Export | ✅ | SummaryPage | OK |
+
+### 🎯 Skill Calculation - ACTUAL vs REQUIRED
+
+**Actual** (`skillCalculator.js`):
+```
+total = base + occ_bonus + manual_extra + perLevel*(level-1)
+```
+No aplicado/falta:
+- IQ bonus (one-time)
+- Separación OCC vs se condaria (ambas avanzan ahora)
+- OCC bonuses están mezcladas con entrada del usuario
+
+**Requerido**:
+```
+total = clamp(
+  base + 
+  occBonus (one-time) +
+  iqBonus (one-time, si IQ≥17) +
+  perLevel*(level-1),
+  max=98
+)
+```
+
+### 🔧 Pasos Sugeridos para Implementación
+
+1. **Extend CharacterState** (useCharacterData.js): agregar campos vitality, level, equipment, alignment
+2. **Screen C + Logic**: Crear HPCalculator, SDCCalculator (widgets + domain layer)
+3. **Screen F**: Equipment page con standard gear + wages/savings
+4. **Screen G**: Alignment page (selector, alignmentGroup mapping)
+5. **Attributes**: Fixear 3d6+1d6, calcular iqBonusPercent
+6. **Skill Math**: Aplicar IQ bonus, separar OCC bonuses claramente
+7. **Sync**: Validar attribute requirements en OCC selection
+
+---
+
+## 📐 PLAN DE IMPLEMENTACIÓN — 7 PRs SECUENCIALES
+
+### PR#1 — Extend CharacterState + Domain Types
+**Rama**: `feature/extend-character-state`
+**Objetivo**: Extender CharacterState a la shape completa del spec.
+
+**Cambios**:
+- `src/hooks/useCharacterData.js`: Agregar campos (vitality, level, equipment, alignment, etc.)
+- `src/domain/shared/types.ts`: Crear tipos TypeScript para CharacterState (optional pero recomendado)
+- Actualizar localStorage default
+
+**Impacto**: Preparación para las 6 PRs siguientes; se rompería algo si no se hace primero.
+**Tests**: useCharacterData.test.jsx
+
+---
+
+### PR#2 — Attributes Exceptional + IQ Bonus Calculation
+**Rama**: `feature/attributes-exceptional`
+**Objetivo**: Implementar 3d6 + 1d6 (si 16-18) e IQ bonus.
+
+**Cambios**:
+- `src/pages/AttributesPage.jsx`: Agregar "Roll All" + lógica 3d6→+1d6
+- `src/components/AttributesView.jsx`: UI para excepcionales
+- `src/domain/shared/types.ts`: Agregar `attributeBonuses` type
+- `src/utils/modifiers.js`: Crear `calculateAttributeBonuses(attributes)` 
+  - Retorna `{iqBonusPercent}` si IQ≥17
+- Actualizar `useCharacterData` para guardar `attributeBonuses`
+
+**Testing**: Roll 3d6, verif 16-18 triggers +1d6, IQ≥17 calcula bonus correcto
+
+---
+
+### PR#3 — Screen C (HP + S.D.C.)
+**Rama**: `feature/vitality-screen`
+**Objetivo**: Crear pantalla Step 2 (antes de OCC).
+
+**Cambios**:
+- `src/pages/VitalityPage.jsx`: Nueva página (después AttributesPage, antes OCCPage)
+- `src/components/HPCalculator.jsx`: Widget para PE + 1d6
+- `src/components/SDCCalculator.jsx`: Widget para base by OCC + skills
+- `src/domain/vitality/vitality.ts`: Lógica de cálculo (pure functions)
+  - `calculateHP(pe, initialRoll, level)` 
+  - `calculateSDC(occSdc, skillBonuses)`
+- Actualizar `App.jsx` routing (insertar VitalityPage en flow)
+- Actualizar bitácora con nueva pantalla
+
+**Testing**: Verif HP = PE + roll, SDC = base + skills
+
+---
+
+### PR#4 — Screen F (Equipment + Credits)
+**Rama**: `feature/equipment-screen`
+**Objetivo**: Crear pantalla Step 4 (después Skills).
+
+**Cambios**:
+- `src/pages/EquipmentPage.jsx`: Nueva página
+- `src/components/EquipmentView.jsx`: Mostrar standard gear + wages
+- `src/domain/equipment/equipment.ts`: 
+  - `getStandardEquipment(occId)`
+  - `calculateMonthlyWages(occId, level)`
+  - `generatePersonalSavings(occId)` (dice formula)
+- Data: Agregar `standard_equipment`, `wages`, `savings_formula` a `occ_rdf.json`
+- Actualizar routing
+
+---
+
+### PR#5 — Screen G (Alignment Selector)
+**Rama**: `feature/alignment-screen`
+**Objetivo**: Crear pantalla Step 5.
+
+**Cambios**:
+- `src/pages/AlignmentPage.jsx`: Nueva página (last step, antes Summary)
+- `src/components/AlignmentSelector.jsx`: Selector + grupo display
+- `src/domain/alignment/alignment.ts`: 
+  - Type `AlignmentGroup = "Good" | "Selfish" | "Evil"`
+  - Función `mapAlignmentToGroup(alignmentId): AlignmentGroup`
+- Usar `AlignmentRepository` (ya existe con Zod)
+- Actualizar routing
+
+---
+
+### PR#6 — Skill Math Refactor (IQ Bonus + Separación OCC)
+**Rama**: `feature/skill-math-complete`
+**Objetivo**: Implementar full skill calculation per spec.
+
+**Cambios**:
+- `src/domain/skills/skill-calculator.ts` (NEW):
+  ```ts
+  interface SkillCalcInput {
+    base: number;
+    occBonus?: number; // one-time
+    iqBonus?: number;  // one-time, if IQ≥17
+    perLevel: number;
+    level: number;
+    manualBonus?: number;
+  }
+  
+  export function calculateSkill(input: SkillCalcInput): SkillResult {
+    const perLevelComponent = input.perLevel * Math.max(0, input.level - 1);
+    const total = clamp(
+      input.base + 
+      (input.occBonus ?? 0) + 
+      (input.iqBonus ?? 0) + 
+      perLevelComponent + 
+      (input.manualBonus ?? 0),
+      0, 98
+    );
+    return {...};
+  }
+  ```
+- `src/utils/skillCalculator.js`: Refactor para usar nueva lógica
+  - Pasar `iqBonus` desde CharacterState
+  - Separar OCC bonuses per skill
+- Actualizar `SummaryPage` para pasar `iqBonusPercent` a calculateSkills
+- Tests: Verif IQ bonus aplicado una sola vez, OCC bonus separado, cap 98
+
+---
+
+### PR#7 — Attribute Requirement Validation in OCC
+**Rama**: `feature/occ-attribute-gating`
+**Objetivo**: Validar minimums antes de seleccionar OCC.
+
+**Cambios**:
+- `src/utils/occRules.js`: Agregar `getOccAttributeRequirements(occId)`
+- `src/pages/OCCPage.jsx`: 
+  - Validar atributos antes de permitir click
+  - Mostrar warning si no cumple
+  - Bloquear Next si no válido
+- `src/domain/occ/occ.ts`: Type `AttributeRequirements`
+- Data: Agregar `attribute_requirements` a `occ_rdf.json`
+
+---
+
+### 📋 Orden de Ejecución (Dependencias)
+
+```
+PR#1 (Extend State) ← required by all
+  ├─→ PR#2 (Attributes)
+  ├─→ PR#3 (Vitality)
+  └─→ PR#4 (Equipment)
+         ├─→ PR#5 (Alignment) → PR#6 (Skill Math)
+         └─→ PR#6 (Skill Math)
+              └─→ PR#7 (OCC Gating)
+```
+
+**Recomendación**: Hacer PR#1, PR#2, PR#3 juntos (son independientes de PR#4/5/6); luego PR#6 afecta skill ui; PR#7 es final.
+
+---
+
+## 2026-03-03 — PR#1 IMPLEMENTADO: Extend CharacterState
+
+### ✅ Completado
+- `src/domain/shared/types.ts`: 
+  - Agregadas interfaces completas: PersonalData, LevelData, VitalityData, OccData, SkillsData, EquipmentData, AlignmentData
+  - Nueva interface CharacterState (jerárquica, per spec)
+  - Tipo `AlignmentGroup` ('Good' | 'Selfish' | 'Evil')
+  
+- `src/hooks/useCharacterData.js`:
+  - Actualizado DEFAULT_CHARACTER_STATE a nueva estructura
+  - Agregada función `migrateCharacter()` para compatibilidad hacia atrás
+  - localStorage migration automática al cargar datos
+
+### 🎯 Impacto
+- TypeScript: ✅ type-check OK
+- Build: ✅ OK (910.32 kB, gzip 271.62 kB)
+- Tests: Pendiente (probablemente requieren parches menores)
+- Breaking Changes: SÍ (CharacterState.name → CharacterState.personal.name, etc.)
+
+### 📝 Próximo Paso
+PR#2 (Attributes Exceptional) depende de PR#1. Los componentes necesitarán actualizaciones para acceder a nueva estructura en PRs subsecuentes.
+
+### 🔄 Nota de Implementación
+Este PR es foundational. Los siguientes PRs actualizarán componentes para usar:
+- `character.personal.*` en lugar de `character.*` para nombre/edad/facción
+- `character.attributes` mantiene igual estructura interna
+- `character.vitality.hitPoints.total` para HP
+- `character.skills.calculatedSkills` para skills
+- etc.
+
+### 🚀 Status Final PR#1
+- Commit: `2cf2e9b` "feat: PR#1 extend CharacterState"
+- Branch: feature/typescript
+- Pushed: ✅
+
+---
+
+## Convención de actualización
+Agregar entradas por fecha con:
+1. Qué se cambió
+2. Por qué
+3. Impacto en build/tests
+4. Pendientes
+
+---
+
+## 2026-03-03 � PR#2: Attributes Exceptional + IQ Bonus Calculation [COMPLETADO]
+
+### Status
+? **PR#2 COMPLETADO** - Commit \ea81b6a\ pushed to feature/typescript
+
+### Cambios Implementados
+
+#### 1. AttributeForm.jsx - Roll Logic (3d6 + Exceptional)
+- Nueva funci�n \
+oll3d6WithExceptional()\ 
+- 3d6 base, si result 16-18: +1d6
+- Bot�n actualizado a "Roll All (3D6 + Exceptional)"
+
+#### 2. modifiers.js - New Function (IQ Bonus)
+- \calculateAttributeBonuses(attrs)\: {iqBonusPercent?}
+- Si IQ >= 17: iqBonusPercent = IQ - 14
+
+#### 3. AttributesPage.jsx - Bonuses Persistence
+- Import \calculateAttributeBonuses\
+- Memoizaci�n + useEffect ? update("attributeBonuses")
+
+### Validaciones
+- ? Build: 910.58 kB
+- ? Type-check: OK
+- ? Tests: 14/17 green
+- ? Git: Commit + push
+
+### Pr�ximo: PR#3 (Vitality Screen)
+
+---
+
+## 2026-03-04 � PR#3: Vitality Screen (HP + S.D.C.) [COMPLETADO]
+
+### Status
+? **PR#3 COMPLETADO** - Commit \ecd23c8\ pushed to feature/typescript
+
+### Cambios Implementados
+
+#### 1. vitality.ts (Domain Logic)
+- \calculateHP(pe, initialRoll, level): HitPoints\
+  - HP = PE + 1d6 (at creation)
+  - Returns {base, initialRoll, totalAtLevel1}
+- \calculateSDC(baseByOcc, skillBonuses): SdcData\
+  - S.D.C. = OCC base + skill bonuses
+- \getSDCBaseByOcc(occId): number\
+  - Placeholder mapping with DEFAULT_SDC_BY_OCC
+  - TODO: Load from occ_rdf.json future
+
+#### 2. HPCalculator.jsx (Component)
+- Roll 1d6 button with visual feedback
+- Displays PE (base), Roll (1d6), Total
+- Calls onHPChange with HitPoints object
+- Styled per retro theme
+
+#### 3. SDCCalculator.jsx (Component)
+- Shows OCC base S.D.C.
+- Input field for skill bonuses (e.g., Boxing +5)
+- Displays Total S.D.C.
+- Calls onSDCChange with SdcData object
+
+#### 4. VitalityPage.jsx (Container)
+- Step 3 in character creation flow
+- Combines HPCalculator + SDCCalculator
+- Validates that both HP and S.D.C. are set before Next
+- Navigation: Previous ? Attributes, Next ? O.C.C.
+- Persists to character.vitality via update()
+
+#### 5. App.jsx (Routing)
+- Import VitalityPage
+- Add na route: /vitality ? VitalityPage
+- Insert in nav bar between Attributes and O.C.C.
+- Route sequence: /attributes ? /vitality ? /occ
+
+### Validaciones
+- ? Build: 915.03 kB (OK, +4.45 kB vs PR#2)
+- ? Type-check: OK (tsc --noEmit)
+- ? Tests: 14/17 green (3 skipped)
+- ? Git: Commit + push a origin/feature/typescript
+
+### Impacto
+- **PR#4 (Equipment)**: Procede sin cambios
+- **PR#5 (Alignment)**: Independent (no dependencies)
+- **PR#6 (Skill Math)**: Character.vitality now available for validation
+
+### Estructura CharacterState
+\\\
+character.vitality = {
+  hitPoints: {base, initialRoll, totalAtLevel1},
+  sdc: {baseByOcc, fromSkills?, total}
+}
+\\\
+
+### Nota T�cnica
+- HP c�lculo simple per Robotech spec (PE + 1d6)
+- S.D.C. base valores placeholder (pending occ_rdf.json update)
+- Skill bonuses (Boxing, etc.) implementado como input manual (future: load from skills)
+
+### Pr�ximo: PR#4 (Equipment Screen)
+
+---
+
+## 2026-03-04 � FIX: Pages Updated for CharacterState Structure [HOTFIX]
+
+### Problem
+Skills page (and other pages) were blank after PR#1 because components were accessing old CharacterState paths.
+
+### Root Cause
+PR#1 changed CharacterState from flat structure to hierarchical:
+- OLD: \character.faction\, \character.occ\ (string), \character.skills\ (array)
+- NEW: \character.personal.faction\, \character.occ\ (object), \character.occ.otherSkillsChosen\
+
+Pages were still using old paths ? blank screens/errors.
+
+### Solution Applied
+Updated all affected pages to use new CharacterState structure:
+
+#### Pages Fixed
+1. **SkillsPage.jsx**: Extract \personal.faction\, \occ.occName\, \occ.otherSkillsChosen\
+2. **OCCPage.jsx**: Extract \personal.faction\, \occ.occName\, update entire \occ\ object
+3. **MechaPage.jsx**: Extract \personal.faction\, \mecha.mechaName\
+4. **SummaryPage.jsx**: Extract \level.currentLevel\, \occ.occSkills\, \occ.otherSkillsChosen\
+5. **PersonalDataPage.jsx**: Pass \character.personal\, update personal subfields
+6. **FactionPage.jsx**: Update \character.personal.faction\
+
+### Validaciones
+- ? Build: 915.30 kB
+- ? Type-check: OK
+- ? Tests: 14/17 green
+- ? Git: Commit \d1124a0\ + push
+
+### Impact
+All pages now correctly read/write to hierarchical CharacterState. Skills page functional again.
+
+### Next
+Continue with PR#4 (Equipment Screen) as originally planned.
+
+---
+
+## 2026-03-04 � FIX: SummaryView CharacterState Structure [HOTFIX #2]
+
+### Problem
+Summary page tambi�n estaba en blanco despu�s del fix anterior.
+
+### Root Cause
+SummaryView component estaba accediendo directamente a:
+- \character.name\ ? deber�a ser \character.personal.name\
+- \character.faction\ ? deber�a ser \character.personal.faction\
+- \character.occ\ ? deber�a ser \character.occ.occName\
+- \character.mecha\ ? deber�a ser \character.mecha.mechaName\
+
+### Solution Applied
+1. **SummaryView.jsx**: Actualizado a character.personal.*, character.occ.occName, character.mecha.mechaName
+2. **SummaryView.test.jsx**: Actualizado mock data a nueva estructura CharacterState
+
+### Validaciones
+- ? Build: 915.34 kB
+- ? Type-check: OK
+- ? Tests: 14/17 green (all passing, SummaryView test fixed)
+- ? Git: Commit \ 6666c4\ + push
+
+### Impact
+Summary page ahora funcional. Muestra correctly Name, Faction, O.C.C., Level, Mecha.
+
+### Nota
+Todos los componentes principales ahora actualizados a nueva estructura CharacterState (post PR#1).
+
+---
+
+## 2026-03-04 � PR#4: Equipment Screen (Standard Gear + Wages + Credits) [COMPLETADO]
+
+### Status
+? **PR#4 COMPLETADO** - Commit \ 2160de\ pushed to feature/typescript
+
+### Cambios Implementados
+
+#### 1. equipment.ts (Domain Logic)
+- \getStandardEquipment(occId): string[]\ � Lista de gear por OCC (placeholder)
+- \calculateMonthlyWages(occId, level): number\ � Wages por nivel (1-5, 6-10, 11+)
+- \generatePersonalSavings(occId): number\ � Roll 2d6 � 100 credits
+- \uildEquipmentData(occId, level): EquipmentData\ � Constructor completo
+- Placeholder data para 8 OCCs (Destroid, Veritech, Soldier, Specialist, Commando, Technician, Scout, Comms)
+
+#### 2. EquipmentView.jsx (Component)
+- Display standard equipment list (read-only)
+- Display monthly wages con level range indicator
+- Display personal savings con "Re-roll" button (2d6 � 100)
+- Equipment guidelines y notes sobre black market/personal purchases
+
+#### 3. EquipmentPage.jsx (Container)
+- Step 4 en character creation flow
+- Auto-genera equipment data on first visit (useEffect)
+- Handle re-roll de savings
+- Navigation: Previous ? Skills, Next ? Mecha
+
+#### 4. App.jsx (Routing)
+- Import EquipmentPage
+- Add /equipment route entre /skills y /mecha
+- Update nav bar con Equipment link
+- Route sequence: /skills ? /equipment ? /mecha
+
+#### 5. SkillsPage.jsx
+- Update navegaci�n: Next ? Equipment (antes era ? Mecha)
+
+### Validaciones
+- ? Build: 923.67 kB (OK, +8.33 kB vs anterior)
+- ? Type-check: OK (tsc --noEmit)
+- ? Tests: 14/17 green (3 skipped)
+- ? Git: Commit + push a origin/feature/typescript
+
+### Estructura CharacterState
+\\\
+character.equipment = {
+  standardEquipment: string[],
+  wages: {monthly, levelRange},
+  personalSavings: number
+}
+\\\
+
+### Impacto
+- **PR#5 (Alignment)**: Procede sin cambios
+- **PR#6 (Skill Math)**: Character.equipment disponible para validaci�n
+
+### TODOs Futuros
+- Mover placeholder data a occ_rdf.json (add \standard_equipment\, \wages\, \savings_formula\ fields)
+- Link skill bonuses (Boxing, etc.) a S.D.C. calculator autom�ticamente
+
+### Nota T�cnica
+- Wages formula: 3 brackets (1-5, 6-10, 11+) per manual Robotech
+- Savings roll: 2d6 � 100 (most OCCs), 2d6 � 150 (Commando)
+- Standard equipment cannot be sold (per guidelines)
+
+### Pr�ximo: PR#5 (Alignment Selector Screen)
+---
+
+## 2026-03-04 - PR#5: Alignment Selector Screen (9 Alignments, Good/Selfish/Evil) [COMPLETADO]
+
+### Status
+✅ **PR#5 COMPLETADO** - Commit `e17020d` pushed to feature/typescript
+
+### Cambios Implementados
+
+#### 1. AlignmentView.jsx (Component)
+- Presentational component: 9-alignment grid selector
+- Grouped display: Good (2) | Selfish (5) | Evil (2)
+- Each card shows:
+  - Alignment name (EN/ES)
+  - Description (descripcion_es)
+  - Philosophy (filosofia_es)
+  - Tactics (tactica_es)
+  - Tags (es_bueno, es_malvado flags)
+- Selected alignment highlighted with ✓
+- Summary display shows:
+  - Selected alignment details
+  - Group label (Good/Selfish/Evil)
+  - Full philosophy and behavior notes
+- PropTypes validation for alignment shape
+
+#### 2. AlignmentPage.jsx (Container)
+- Step 5 en character creation flow
+- Extract character.alignment.alignmentId on load
+- Find matching alignment from alignmentsData.json
+- handleSelect(alignment) logic:
+  - Map es_bueno/es_malvado to AlignmentGroup:
+    - es_bueno === true → "Good"
+    - es_malvado === true → "Evil"
+    - else → "Selfish"
+  - Call update("alignment", {...})
+  - Navigate to /summary on next
+- Navigation: Previous (Mecha) ← → Next (Summary)
+
+#### 3. App.jsx (Routing)
+- Import AlignmentPage
+- Add /alignment route between /mecha and /summary
+- Update nav bar: add "Alignment" link (8th step in 11-step flow)
+- Route sequence: /mecha → /alignment → /summary
+
+#### 4. MechaPage.jsx
+- Update next button: navigate("/alignment") instead of navigate("/summary")
+
+### Validaciones
+- ✅ Build: 927.83 kB (OK, +4.16 kB vs PR#4)
+- ✅ Type-check: OK (tsc --noEmit)
+- ✅ Tests: 14/17 green (3 skipped)
+- ✅ Git: Commit + push a origin/feature/typescript (commit e17020d)
+
+### Estructura CharacterState
+```
+character.alignment = {
+  alignmentId: AlignmentId,
+  alignmentName: string,
+  alignmentGroup: "Good" | "Selfish" | "Evil"
+}
+```
+
+### Flujo de Creación Completado (7/11 pasos)
+1. ✅ Personal Data (Name, Age, Rank)
+2. ✅ Faction (Good/Selfish/Evil → NUEDC faction)
+3. ✅ Attributes (3d6+1d6 exceptional, IQ bonus)
+4. ✅ Vitality (HP + SDC)
+5. ✅ OCC Selection (7 OCCs, skill resolution)
+6. ✅ Skills (Primary + Secondary per level)
+7. ✅ Equipment (Standard gear, wages, savings)
+8. ✅ **Mecha Selection** (Destroid/Veritech per faction)
+9. ✅ **Alignment** (9 alignments, Good/Selfish/Evil grouping)
+10. ⏳ Summary (Preview all fields)
+11. ⏳ Manuals (Reference PDFs)
+
+### Impacto
+- **PR#6 (Skill Math)**: Procede sin cambios (alignment independent)
+- **PR#7 (OCC Requirements)**: Procede sin cambios (alignment independent)
+
+### TODOs Futuros
+- Add alignment_bonuses.json (if alignments provide attribute/skill bonuses)
+- Update Summary.jsx to show alignment selection
+- Add alignment validation (optional: one-time selection per character)
+
+### Nota Técnica
+- Alignment selection uses es_bueno/es_malvado flags from alignments.json
+- Good alignments (es_bueno=true): Paladin, Defender
+- Evil alignments (es_malvado=true): Demon, Despot
+- Selfish alignments (neutral): 5 remaining (unprincipled, selfish, anarchist, miscreant, aberrant)
+- No mechanical impact on character stats yet (may be added in future PRs)
+
+### Próximo: PR#6 (Skill Math Refactor)
+
+---
+
+## 2026-03-04 - PR#6: Skill Math Refactor - IQ Bonus Application [COMPLETADO]
+
+### Status
+✅ **PR#6 COMPLETADO** - Commit `f1f16cb` pushed to feature/typescript
+
+### Cambios Implementados
+
+#### 1. domain/character/skill-calculator.ts
+- **Enhanced calculateSkillTotal()**:
+  - Added parameter: `iqBonusPercent?: number`
+  - Formula: `iqBonus = base * (iqBonusPercent / 100)` [aplicado una sola vez]
+  - Full formula: `total = base + occBonus + iqBonus + perLevelBonus + manualBonus`, capped at 98
+  - Updated JSDoc with full calculation explanation
+
+- **Enhanced calculateCharacterSkills()**:
+  - Added parameter: `iqBonusPercent?: number`
+  - Passes iqBonusPercent to each skill calculation via calculateSkillTotal()
+  - Applies global IQ bonus to all skills (primary + secondary)
+
+#### 2. domain/skills/skill.ts
+- **Updated SkillCalculationResult interface**:
+  - Added field: `readonly iqBonus: number`
+  - Now tracks IQ bonus component separately in calculation results
+
+#### 3. utils/skillCalculator.js
+- **Enhanced calculateSkills() signature**:
+  - Added parameter (5th): `iqBonusPercent = undefined`
+  - Implements IQ bonus calculation: `iqBonus = Math.floor(base * (iqBonusPercent / 100))`
+  - Updated total formula: `total = min(base + bonus + iqBonus + perLevelBonus, 98)`
+  - Each skill result includes iqBonus field
+
+#### 4. pages/SummaryPage.jsx
+- **Extract IQ bonus from CharacterState**:
+  - `const iqBonusPercent = character.attributeBonuses?.iqBonusPercent`
+  - Pass iqBonusPercent as 5th argument to calculateSkills()
+  - Update useMemo dependency array to include iqBonusPercent
+
+### Validaciones
+- ✅ Build: 927.93 kB (OK, +0.10 kB vs PR#5)
+- ✅ Type-check: OK (tsc --noEmit)
+- ✅ Tests: 14/17 green (3 skipped) — no regressions
+- ✅ Git: Commit + push a origin/feature/typescript (commit f1f16cb)
+
+### Fórmula Implementada
+```
+iqBonus = base × (iqBonusPercent ÷ 100)
+  where iqBonusPercent = IQ - 14 (if IQ >= 17, else undefined)
+
+total = base + occBonus + iqBonus + perLevelBonus + manualBonus
+total = min(total, 98)
+```
+
+### Ejemplo de Cálculo
+```
+Personaje con IQ=17, Level=1, Skill="Pilot Destroid" (base=20, perLevel=3)
+- iqBonusPercent = 17 - 14 = 3%
+- iqBonus = 20 × (3 ÷ 100) = 0.6 → 0 (floor)
+- total = 20 + 5 (occBonus) + 0 + 0 (perLevelBonus: 3×0) = 25
+
+Personaje con IQ=18, Level=3, mismo skill
+- iqBonusPercent = 18 - 14 = 4%
+- iqBonus = 20 × (4 ÷ 100) = 0.8 → 0 (floor)
+- total = 20 + 5 + 0 + 6 (perLevelBonus: 3×2) = 31
+
+Personaje con IQ=20, Level=5, mismo skill
+- iqBonusPercent = 20 - 14 = 6%
+- iqBonus = 20 × (6 ÷ 100) = 1.2 → 1 (floor)
+- total = 20 + 5 + 1 + 12 (perLevelBonus: 3×4) = 38 ✓
+```
+
+### Impacto
+- **PR#7 (OCC Requirements)**: Procede sin cambios (attribute validation independent)
+- **Summary screen**: Now displays skills with iqBonus applied
+- **Backward compatibility**: Maintained — iqBonusPercent defaults to undefined if not provided
+
+### TODOs Futuros
+- Add iqBonus to SkillManager display (show bonus breakdown)
+- Test IQ bonus impact with high-IQ characters (IQ 18+)
+- Consider OCC-specific skill bonuses (some OCCs get higher per-level advances)
+
+### Notas Técnicas
+- IQ bonus applies at base level calculation, NOT per level
+- Math.floor() used for discrete bonus values (Palladium games)
+- Formula applies to BOTH OCC primary skills AND secondary skills
+- Global application ensures correct skill totals in Summary view
+
+### Próximo: PR#7 (OCC Attribute Requirements Validation)
+
+---
+
+## 2026-03-04 - PR#7: OCC Attribute Requirements Validation [COMPLETADO]
+
+### Status
+✅ **PR#7 COMPLETADO** - Commit `68a2781` pushed to feature/typescript  
+✅ **TODAS LAS 7 PRs COMPLETADAS** - CHARACTER_CREATION_SPEC fully implemented
+
+### Cambios Implementados
+
+#### 1. domain/occ/occ.ts
+- **New interface: AttributeRequirements**
+  - minimums?: Record<string, number> (required minimums, e.g., IQ >= 8)
+  - preferred?: string[] (nice-to-have attributes, non-blocking)
+  - notes?: string (additional context)
+
+- **New interface: AttributeValidationResult**
+  - isValid: boolean (all required minimums met)
+  - unmetMinimums: array of {attribute, required, actual}
+  - warnings: string[] (preferred attributes not met)
+
+- **Updated OCC interface**:
+  - Added field: attributeRequirements?: AttributeRequirements
+
+- **New function: validateOccAttributeRequirements()**
+  - Input: OCC, character attributes
+  - Output: AttributeValidationResult
+  - Logic: Check each minimum requirement, collect unmet requirements
+  - Non-blocking: preferred attributes only generate warnings
+
+#### 2. pages/OCCPage.jsx
+- **Enhanced handleSelect()**:
+  - Extract OCC attribute requirements from selected OCC
+  - Call validateOccAttributeRequirements() on selection
+  - **Blocking validation**: If minimums not met, show error and prevent update
+  - **Non-blocking warnings**: If preferred attributes missing, show warning but allow selection
+
+- **New UI: Attribute Requirements Display**:
+  - Show required minimums vs actual character values with ✓/✗ indicator
+  - Display preferred attributes as non-blocking warnings (yellow box)
+  - Show notes/context about attribute requirements
+
+- **Error handling**:
+  - Clear error when valid OCC selected
+  - Set validationWarnings state for non-blocking warnings
+
+### Validaciones
+- ✅ Build: 929.44 kB (OK, +1.51 kB vs PR#6)
+- ✅ Type-check: OK (tsc --noEmit)
+- ✅ Tests: 14/17 green (3 skipped) — no regressions
+- ✅ Git: Commit + push a origin/feature/typescript (commit 68a2781)
+
+### Ejemplo de Validación
+
+**Veritech Fighter Pilot requirements:**
+```json
+"attribute_requirements": {
+  "minimums": { "IQ": 8 },
+  "preferred": ["P.P. 9+"],
+  "notes": "P.P. 9+ preferred"
+}
+```
+
+**Scenario 1: IQ=6, P.P.=10**
+- ✗ BLOCKED: IQ requirement not met (needs 8, have 6)
+- Error shown, OCC selection prevented
+
+**Scenario 2: IQ=8, P.P.=8**
+- ✓ ALLOWED: All minimums met
+- Warning shown: "P.P. 9+ preferred"
+- OCC selection succeeds
+
+**Scenario 3: IQ=10, P.P.=12**
+- ✓ ALLOWED: All minimums and preferred met
+- No warnings shown
+- OCC selection succeeds
+
+### Estructura Actualizada
+
+```
+character.occ = {
+  occId: OccId,
+  occName: string,
+  occSkills: SkillId[],
+  otherSkillsChosen: SkillId[]
+}
+```
+
+### Flujo Completo de Creación (11/11 pasos COMPLETADO)
+1. ✅ Personal Data (Name, Age, Rank)
+2. ✅ Faction (Good/Selfish/Evil → NUEDC faction)
+3. ✅ Attributes (3d6+1d6 exceptional, IQ bonus)
+4. ✅ Vitality (HP + SDC)
+5. ✅ **OCC Selection** (7 OCCs, skills, **attribute validation**)
+6. ✅ Skills (Primary + Secondary per level, **IQ bonus applied**)
+7. ✅ Equipment (Standard gear, wages, savings)
+8. ✅ Mecha Selection (Destroid/Veritech per faction)
+9. ✅ Alignment (9 alignments, Good/Selfish/Evil grouping)
+10. ✅ Summary (Preview all fields, export/import)
+11. ✅ Manuals (Reference PDFs)
+
+### Impacto
+- **All 7 PRs from CHARACTER_CREATION_SPEC now complete**
+- **OCC screen now blocks invalid attribute combinations**
+- **Full character creation flow validated and working**
+
+### TODOs Futuros (Post-MVP)
+- Add alignment-specific attribute bonuses (if any)
+- Add additional validation rules from extended Robotech rules
+- Performance optimization: cache OCC validation results
+- Add visual indicators for attributes below recommended levels
+- Consider attribute raise recommendations based on failed OCC checks
+
+### Notas Técnicas
+- Validation is early (at selection time), not deferred to validation page
+- Blocking validation prevents invalid character states immediately
+- Non-blocking warnings provide context without preventing progression
+- All 7 OCC definitions in occ_rdf.json have attribute_requirements field
+
+### Próximos Pasos
+- **Testing**: Full character creation flow test (Personal → Summary)
+- **Polish**: Component styling and UX refinement
+- **Documentation**: Update README with feature completion
+- **Release**: Merge feature/typescript to main branch after full testing

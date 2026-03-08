@@ -15,3 +15,21 @@ export const calcModifiers = (attrs) => {
 
   return mods;
 };
+
+/**
+ * Calcula bonificaciones de atributos para aplicar a skills
+ * Per CHARACTER_CREATION_SPEC: si IQ >= 17, aplicar iqBonusPercent a todos los skills (one-time)
+ * @param {Object} attrs - AttributeValues {IQ, ME, MA, PS, PP, PE, PB, Spd}
+ * @returns {Object} {iqBonusPercent?}
+ */
+export const calculateAttributeBonuses = (attrs) => {
+  const bonuses = {};
+
+  // IQ >= 17 gives one-time skill bonus
+  if (attrs.IQ >= 17) {
+    // Bonus is IQ - 14 (matching skillsBonus from calcModifiers)
+    bonuses.iqBonusPercent = attrs.IQ - 14;
+  }
+
+  return bonuses;
+};

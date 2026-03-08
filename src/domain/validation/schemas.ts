@@ -1,0 +1,168 @@
+/**
+ * Esquemas de validación con Zod
+ * Punto 8: Introducir validación de datos con Zod para OCC, Skills y Mechas
+ *
+ * Ventajas:
+ * - Validación en tiempo de carga (startup)
+ * - TypeError nunca llega a TypeScript code
+ * - Feedback claro de qué datos son inválidos
+ * - Tipado automático from validation
+ */
+
+import { z } from 'zod';
+import { Era, SkillCategory } from '../shared/types';
+
+/**
+ * Esquema para validar un Skill desde JSON
+ * Nota: category es string porque puede venir de JSON con diferentes formatos
+ * Se valida al mapear al domain
+ */
+export const SkillSchema = z.object({
+  id: z.string().min(1),
+  name_es: z.string().min(1),
+  name_en: z.string().min(1),
+  category: z.string().min(1), // Accept any string, validate context-specific values
+  base: z.number().int().min(0).max(98),
+  perLevel: z.number().int().min(0).max(10),
+  exclusiveToOcc: z.string().optional(),
+  hasPerLevelAdvance: z.boolean().default(true),
+});
+
+export type ValidatedSkill = z.infer<typeof SkillSchema>;
+
+/**
+ * Esquema para validar una OCC desde JSON
+ */
+export const OccSchema = z.object({
+  id: z.string().min(1),
+  name_es: z.string().min(1),
+  name_en: z.string().min(1),
+  category: z.string().min(1).optional().default('Unknown'),
+  era: z.nativeEnum(Era).optional().default(Era.MACROSS),
+  description_es: z.string().optional().default(''),
+  factions: z.array(z.string()).optional().default([]),
+  primarySkills: z.array(z.string()).optional().default([]),
+  secondarySkillsAllowed: z.object({
+    count: z.number().int().positive().optional().default(6),
+    categories: z.array(z.nativeEnum(SkillCategory)).optional().default([]),
+  }).optional(),
+});
+
+export type ValidatedOcc = z.infer<typeof OccSchema>;
+
+/**
+ * Esquema para validar una ubicación de MDC
+ */
+const MDCLocationSchema = z.object({
+  value: z.number().int().positive(),
+  each: z.boolean(),
+});
+
+/**
+ * Esquema para validar un sistema de armas
+ */
+const WeaponSystemSchema = z.object({
+  name_es: z.string().min(1),
+  name_en: z.string().min(1),
+  damage: z.string().min(1),
+  range: z.string().min(1),
+  notes: z.string().optional(),
+});
+
+/**
+ * Esquema para validar un Mecha desde JSON
+ * Punto 12: Validar estructura normalizada de MDC y armas
+ * Nota: Muchos campos son opcionales por compatibilidad con mechas.json
+ */
+export const MechaSchema = z.object({
+  id: z.string().min(1),
+  name_es: z.string().min(1).optional(),
+  name_en: z.string().min(1).optional(),
+  name: z.string().min(1).optional(), // Fallback from mechas.json
+  era: z.nativeEnum(Era).optional().default(Era.MACROSS),
+  category: z.string().min(1).optional().default('Unknown'),
+  description_es: z.string().optional().default(''),
+  description: z.string().optional().default(''), // Fallback
+  mdcByLocation: z.record(z.string(), MDCLocationSchema).optional().default({}),
+  mdc_by_location: z.record(z.string(), MDCLocationSchema).optional().default({}),
+  weaponSystems: z.array(WeaponSystemSchema).optional().default([]),
+  weapon_systems: z.array(WeaponSystemSchema).optional().default([]),
+  modes: z.array(z.string()).optional(),
+});
+
+export type ValidatedMecha = z.infer<typeof MechaSchema>;
+
+/**
+ * Esquema para validar un Alignment desde JSON
+ */
+export const AlignmentSchema = z.object({
+  id: z.string().min(1),
+  name_en: z.string().min(1),
+  name_es: z.string().min(1),
+  descripcion_es: z.string().optional().default(''),
+  filosofia_es: z.string().optional().default(''),
+  comportamiento_tactico_es: z.string().optional().default(''),
+  es_bueno: z.boolean().optional().default(false),
+  es_malvado: z.boolean().optional().default(false),
+  es_caotico: z.boolean().optional().default(false),
+  etiquetas: z.array(z.string()).optional().default([]),
+});
+
+export type ValidatedAlignment = z.infer<typeof AlignmentSchema>;
+
+/**
+ * Funciones de validación principales
+ * Usadas en carga de datos (repositories)
+ */
+
+export function validateSkills(data: unknown): ValidatedSkill[] {
+  try {
+    return z.array(SkillSchema).parse(data);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const issues = error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('\n');
+      console.error('❌ Error validando skills:', issues);
+      throw new Error(`Skills validation failed: ${error.message}`);
+    }
+    throw error;
+  }
+}
+
+export function validateOccs(data: unknown): ValidatedOcc[] {
+  try {
+    return z.array(OccSchema).parse(data);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const issues = error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('\n');
+      console.error('❌ Error validando OCCs:', issues);
+      throw new Error(`OCCs validation failed: ${error.message}`);
+    }
+    throw error;
+  }
+}
+
+export function validateMechas(data: unknown): ValidatedMecha[] {
+  try {
+    return z.array(MechaSchema).parse(data);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const issues = error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('\n');
+      console.error('❌ Error validando Mechas:', issues);
+      throw new Error(`Mechas validation failed: ${error.message}`);
+    }
+    throw error;
+  }
+}
+
+export function validateAlignments(data: unknown): ValidatedAlignment[] {
+  try {
+    return z.array(AlignmentSchema).parse(data);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const issues = error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('\n');
+      console.error('❌ Error validando Alignments:', issues);
+      throw new Error(`Alignments validation failed: ${error.message}`);
+    }
+    throw error;
+  }
+}
