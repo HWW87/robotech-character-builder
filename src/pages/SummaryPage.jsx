@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import SummaryView from "../components/SummaryView";
 import { exportCharacter, importCharacter } from "../utils/exportImport";
 import { calculateSkills } from "../utils/skillCalculator";
@@ -11,6 +12,7 @@ import { useCharacterData } from "../hooks/useCharacterData";
  */
 export default function SummaryPage() {
   const { character, update, reset } = useCharacterData();
+  const navigate = useNavigate();
 
   const [importError, setImportError] = React.useState("");
 
@@ -54,6 +56,7 @@ export default function SummaryPage() {
         onExport={() => exportCharacter(character)}
         onImport={handleImport}
         onReset={reset}
+        onExit={() => navigate("/")}
       />
     </>
   );

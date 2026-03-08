@@ -17,6 +17,7 @@ export default function SummaryView({
   onExport,
   onImport,
   onReset,
+  onExit,
 }) {
   const levelDelta = Math.max(0, (level || 1) - 1);
 
@@ -83,7 +84,18 @@ export default function SummaryView({
   return (
     <div className="p-6">
       <RetroCard title="Character Summary">
-        <div className="bg-white p-6 rounded-xl shadow-lg text-sm">
+        <div className="bg-white p-6 rounded-xl shadow-lg text-sm relative">
+          {/* Mobile-only Exit Button */}
+          {onExit && (
+            <button
+              onClick={onExit}
+              className="sm:hidden absolute top-4 right-4 px-3 py-1 text-xs font-semibold bg-red-500 text-white rounded hover:bg-red-600 transition-colors shadow-sm"
+              aria-label="Salir"
+            >
+              Salir
+            </button>
+          )}
+          
           {/* Character Sheet Header: Portrait + Info + Faction Emblem */}
           <div className="flex items-start gap-4 mb-6 pb-4 border-b-2 border-gray-300">
             {/* Left: Character Portrait */}
@@ -240,5 +252,6 @@ SummaryView.propTypes = {
   onExport: PropTypes.func.isRequired,
   onImport: PropTypes.func.isRequired,
   onReset: PropTypes.func.isRequired,
+  onExit: PropTypes.func,
 };
 
