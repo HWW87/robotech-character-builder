@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
  * Estructura jerárquica completa con todas las secciones del spec
  */
 const DEFAULT_CHARACTER_STATE = {
+  moduleId: "macross_book1",
   personal: {
     name: "",
     age: undefined,
@@ -44,6 +45,14 @@ const DEFAULT_CHARACTER_STATE = {
     occName: "",
     occSkills: [],
     otherSkillsChosen: [],
+  },
+  southernCross: {
+    armyId: "",
+    armyName: "",
+    mosId: "",
+    mosName: "",
+    mosBonusPercent: 0,
+    mosSkills: [],
   },
   skills: {
     calculatedSkills: [],
@@ -127,11 +136,25 @@ function migrateCharacter(legacy) {
     if (!legacy.personal.faction && legacy.faction) {
       legacy.personal.faction = legacy.faction;
     }
+    if (!legacy.moduleId) {
+      legacy.moduleId = "macross_book1";
+    }
+    if (!legacy.southernCross) {
+      legacy.southernCross = {
+        armyId: "",
+        armyName: "",
+        mosId: "",
+        mosName: "",
+        mosBonusPercent: 0,
+        mosSkills: [],
+      };
+    }
     return legacy;
   }
 
   // Otherwise, map legacy fields to new structure
   return {
+    moduleId: legacy.moduleId || "macross_book1",
     personal: {
       name: legacy.name || "",
       age: legacy.age,
@@ -158,6 +181,14 @@ function migrateCharacter(legacy) {
       occName: legacy.occName || "",
       occSkills: [],
       otherSkillsChosen: legacy.skills || [],
+    },
+    southernCross: legacy.southernCross || {
+      armyId: "",
+      armyName: "",
+      mosId: "",
+      mosName: "",
+      mosBonusPercent: 0,
+      mosSkills: [],
     },
     skills: legacy.skills_data || {
       calculatedSkills: [],

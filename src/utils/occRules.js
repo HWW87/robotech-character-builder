@@ -9,14 +9,24 @@ import { getAllOccs, getOccById, resolveOccId } from "../infrastructure/reposito
 import { getAllSkills, resolveSkillId } from "../infrastructure/repositories/SkillRepository";
 import occData from "../data/occ_rdf.json";
 import skillsData from "../data/skills_rdf.json";
+import southernCrossOccsData from "../data/southern_cross/occs.json";
+import southernCrossSkillsData from "../data/southern_cross/skills.json";
+import { normalizeFactionId } from "./southernCrossRules";
 
 /**
  * Return the list of OCC display names by faction.
  * @deprecated Usar getOccsByFaction() de OccRepository
  */
 export const getOccByFaction = (faction) => {
+  const normalizedFaction = normalizeFactionId(faction);
+
+  if (normalizedFaction === "southern_cross") {
+    return (southernCrossOccsData.occs || []).map(o => o.name_en);
+  }
+
+  const mappedFaction = normalizedFaction === "rdf" ? "RDF" : faction;
   const occs = faction 
-    ? getAllOccs().filter(o => !o.factions || o.factions.length === 0 || o.factions.includes(faction) || o.factions.includes("Any"))
+    ? getAllOccs().filter(o => !o.factions || o.factions.length === 0 || o.factions.includes(mappedFaction) || o.factions.includes("Any"))
     : getAllOccs();
   return occs.map(o => o.name_en);
 };
@@ -26,6 +36,9 @@ export const getOccByFaction = (faction) => {
  * @deprecated Usar getOccById() de OccRepository
  */
 export const getOccDetails = (name) => {
+  const southernOcc = (southernCrossOccsData.occs || []).find(o => o.name_en === name);
+  if (southernOcc) return southernOcc;
+
   const occ = getAllOccs().find(o => o.name_en === name);
   return occ || null;
 };
@@ -64,7 +77,9 @@ const normalizeSkillName = (name) => {
 };
 
 export const getAllSkillNames = () => {
-  return getAllSkills().map(s => s.name_es);
+  const baseSkills = getAllSkills().map(s => s.name_es);
+  const southernSkills = (southernCrossSkillsData.skills || []).map(s => s.name);
+  return Array.from(new Set([...baseSkills, ...southernSkills]));
 };
 
 /**
@@ -76,6 +91,11 @@ export const getAllSkillNames = () => {
 export const getAllowedSecondarySkills = (occName) => {
   const occ = getOccDetails(occName);
   if (!occ) return [];
+
+  if (occ.id && String(occ.id).startsWith("sc_")) {
+    const occSkillSet = new Set((occ.occ_skills || []).map((s) => s.skill));
+    return getAllSkillNames().filter((name) => !occSkillSet.has(name));
+  }
 
   const allSkills = getAllSkills();
 
@@ -111,5 +131,6 @@ export const getAllowedSecondarySkills = (occName) => {
 export const getOtherSkillLimit = (occName) => {
   const occ = getOccDetails(occName);
   if (!occ) return Infinity;
+  if (occ.other_skills?.select_count) return occ.other_skills.select_count;
   return occ.secondarySkillsAllowed?.count ?? Infinity;
 };

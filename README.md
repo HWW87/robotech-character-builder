@@ -16,6 +16,16 @@ Una aplicación interactiva para crear personajes RPG en el universo de Robotech
 - **Asignación de Mecha**: Selecciona desde un catálogo completo con estadísticas detalladas (M.D.C. por ubicación, armamento, etc.)
 - **Resumen Completo**: Vista de todo el personaje con exportación/importación (en desarrollo)
 
+### Módulo adicional: Southern Cross (Book 4)
+
+- Facción `southern_cross` con selección de Army (15 Armies)
+- Flujo de skills: **OCC -> MOS -> Other**
+- Bonus MOS aplicado solo a skills MOS
+- Prevención de duplicados entre OCC, MOS y Other
+- Restricción de mechas por OCC (`ATAC` vs `TASC`)
+
+Referencia técnica: ver `SOUTHERN_CROSS_MODULE.md`.
+
 ## 🛠 Tech Stack
 
 - **React 18** — UI library

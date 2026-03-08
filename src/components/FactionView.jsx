@@ -1,5 +1,6 @@
 import React from "react";
 import RetroCard from "./RetroCard";
+import southernCrossLogo from "../assets/factions/southern_cross_logo.svg";
 
 /**
  * Componente presentacional puro para selección de facción.
@@ -8,9 +9,13 @@ import RetroCard from "./RetroCard";
 export default function FactionView({ onSelectFaction }) {
   const factions = [
     { key: "RDF", label: "RDF - Robotech Defense Force" },
-    { key: "Southern Cross", label: "Southern Cross Army" },
-    { key: "Zentraedi", label: "Zentraedi Regime" },
-    { key: "Invid", label: "Invid Collective" },
+    {
+      key: "southern_cross",
+      label: "Southern Cross Army",
+      logo: southernCrossLogo,
+    },
+    { key: "zentraedi", label: "Zentraedi Regime" },
+    { key: "invid", label: "Invid Collective" },
   ];
   return (
     <RetroCard title="Select Faction">
@@ -22,6 +27,13 @@ export default function FactionView({ onSelectFaction }) {
             className="p-3 border rounded cursor-pointer hover:shadow-lg transition"
             onClick={() => onSelectFaction(f.key)}
           >
+            {f.logo && (
+              <img
+                src={f.logo}
+                alt={`${f.label} logo`}
+                className="w-12 h-12 object-contain mb-2"
+              />
+            )}
             {f.label}
           </div>
         ))}

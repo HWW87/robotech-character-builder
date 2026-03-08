@@ -47,6 +47,11 @@ export default function SummaryView({
               <p>
                 <strong>Faction:</strong> {character.personal?.faction || "—"}
               </p>
+              {character.moduleId === "southern_cross_book4" && (
+                <p>
+                  <strong>Army:</strong> {character.southernCross?.armyName || "—"}
+                </p>
+              )}
               <p>
                 <strong>O.C.C.:</strong> {character.occ?.occName || "—"}
               </p>
@@ -58,6 +63,11 @@ export default function SummaryView({
               <p>
                 <strong>Mecha:</strong> {character.mecha?.mechaName || "—"}
               </p>
+              {character.moduleId === "southern_cross_book4" && (
+                <p>
+                  <strong>MOS:</strong> {character.southernCross?.mosName || "—"}
+                </p>
+              )}
             </div>
           </div>
 

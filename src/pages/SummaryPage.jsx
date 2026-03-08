@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
 import SummaryView from "../components/SummaryView";
 import { exportCharacter, importCharacter } from "../utils/exportImport";
-import { calculateSkills } from "../utils/skillCalculator";
 import { useCharacterData } from "../hooks/useCharacterData";
+import { getSkillSelectionEngine } from "../domain/skills/selection-engine";
 
 /**
  * Container component para Summary Page.
@@ -28,14 +28,37 @@ export default function SummaryPage() {
 
   // Extract from new CharacterState structure (per PR#1)
   const level = character.level?.currentLevel || 1;
+  const moduleId = character.moduleId || "macross_book1";
   const occSkills = character.occ?.occSkills || [];
   const otherSkillsChosen = character.occ?.otherSkillsChosen || [];
+  const mosSkills = character.southernCross?.mosSkills || [];
+  const mosBonusPercent = character.southernCross?.mosBonusPercent || 0;
   const extraBonuses = character.extraBonuses || {};
   const iqBonusPercent = character.attributeBonuses?.iqBonusPercent; // Per PR#6: pass IQ bonus to skill calc
 
+  const skillEngine = useMemo(() => getSkillSelectionEngine(moduleId), [moduleId]);
+
   const calculated = useMemo(
-    () => calculateSkills(occSkills, otherSkillsChosen, level, extraBonuses, iqBonusPercent),
-    [occSkills, otherSkillsChosen, level, JSON.stringify(extraBonuses), iqBonusPercent]
+    () =>
+      skillEngine.selectAndCalculate({
+        occSkills,
+        secondarySkills: otherSkillsChosen,
+        mosSkills,
+        mosBonusPercent,
+        level,
+        extraBonuses,
+        iqBonusPercent,
+      }),
+    [
+      skillEngine,
+      occSkills,
+      otherSkillsChosen,
+      mosSkills,
+      mosBonusPercent,
+      level,
+      JSON.stringify(extraBonuses),
+      iqBonusPercent,
+    ]
   );
 
   return (

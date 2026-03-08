@@ -1,0 +1,38 @@
+{
+  "source": "Robotech RPG - Book 4 (Southern Cross)",
+  "mos": [
+    {
+      "id": "mos_atac_strike",
+      "name": "ATAC Strike",
+      "occ_ids": ["sc_atac_pilot"],
+      "bonus_percent": 10,
+      "skills": ["Pilot Veritech Fighter", "Navigation", "Mecha Mechanics"],
+      "selection_rules": {
+        "pick": 2,
+        "from": ["Pilot Veritech Fighter", "Navigation", "Mecha Mechanics"]
+      }
+    },
+    {
+      "id": "mos_tasc_assault",
+      "name": "TASC Assault",
+      "occ_ids": ["sc_tasc_operator"],
+      "bonus_percent": 10,
+      "skills": ["Pilot Mecha (all Destroids)", "Mechanical Engineering", "Weapon Systems"],
+      "selection_rules": {
+        "pick": 2,
+        "from": ["Pilot Mecha (all Destroids)", "Mechanical Engineering", "Weapon Systems"]
+      }
+    },
+    {
+      "id": "mos_field_command",
+      "name": "Field Command",
+      "occ_ids": ["sc_military_specialist", "sc_atac_pilot", "sc_tasc_operator"],
+      "bonus_percent": 5,
+      "skills": ["Radio: Scrambler", "Surveillance", "Intelligence"],
+      "selection_rules": {
+        "pick": 2,
+        "from": ["Radio: Scrambler", "Surveillance", "Intelligence"]
+      }
+    }
+  ]
+}

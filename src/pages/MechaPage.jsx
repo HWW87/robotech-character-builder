@@ -11,6 +11,8 @@ export default function MechaPage() {
 
   // Extract from new CharacterState structure (per PR#1)
   const faction = character.personal?.faction || "";
+  const moduleId = character.moduleId || "macross_book1";
+  const occName = character.occ?.occName || "";
   const mechaName = character.mecha?.mechaName || "";
 
   const selected = getMechaByName(mechaName);
@@ -27,6 +29,8 @@ export default function MechaPage() {
     <div>
       <MechaSelector
         faction={faction}
+        moduleId={moduleId}
+        occName={occName}
         mecha={mechaName}
         onSelect={handleMechaSelect}
       />

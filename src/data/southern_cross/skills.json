@@ -1,0 +1,14 @@
+{
+  "source": "Robotech RPG - Book 4 (Southern Cross)",
+  "skills": [
+    { "name": "Pilot Veritech Fighter", "base": 50, "per_level": 2, "category": "Pilot" },
+    { "name": "Navigation", "base": 40, "per_level": 2, "category": "Pilot Related" },
+    { "name": "Mecha Mechanics", "base": 35, "per_level": 5, "category": "Mechanical" },
+    { "name": "Pilot Mecha (all Destroids)", "base": 50, "per_level": 3, "category": "Pilot" },
+    { "name": "Mechanical Engineering", "base": 40, "per_level": 4, "category": "Mechanical" },
+    { "name": "Intelligence", "base": 35, "per_level": 5, "category": "Espionage" },
+    { "name": "Radio: Scrambler", "base": 35, "per_level": 5, "category": "Communications" },
+    { "name": "Surveillance", "base": 30, "per_level": 5, "category": "Communications" },
+    { "name": "W.P. Rifle", "base": 35, "per_level": 5, "category": "W.P." }
+  ]
+}

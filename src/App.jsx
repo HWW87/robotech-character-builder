@@ -2,9 +2,11 @@ import React from "react";
 import { HashRouter as Router, Routes, Route, Link } from "react-router-dom";
 import PersonalDataPage from "./pages/PersonalDataPage";
 import FactionPage from "./pages/FactionPage";
+import ArmyPage from "./pages/ArmyPage";
 import AttributesPage from "./pages/AttributesPage";
 import VitalityPage from "./pages/VitalityPage";
 import OCCPage from "./pages/OCCPage";
+import MOSPage from "./pages/MOSPage";
 import SkillsPage from "./pages/SkillsPage";
 import EquipmentPage from "./pages/EquipmentPage";
 import MechaPage from "./pages/MechaPage";
@@ -40,9 +42,11 @@ export default function App() {
             <Route path="/" element={<PersonalDataPage />} />
             <Route path="/personal" element={<PersonalDataPage />} />
             <Route path="/faction" element={<FactionPage />} />
+            <Route path="/army" element={<ArmyPage />} />
             <Route path="/attributes" element={<AttributesPage />} />
             <Route path="/vitality" element={<VitalityPage />} />
             <Route path="/occ" element={<OCCPage />} />
+            <Route path="/mos" element={<MOSPage />} />
             <Route path="/skills" element={<SkillsPage />} />
             <Route path="/equipment" element={<EquipmentPage />} />
             <Route path="/mecha" element={<MechaPage />} />

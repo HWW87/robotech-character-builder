@@ -1,0 +1,20 @@
+{
+  "source": "Robotech RPG - Book 4 (Southern Cross)",
+  "armies": [
+    { "id": "01st_atac", "name": "1st ATAC Battalion" },
+    { "id": "02nd_atac", "name": "2nd ATAC Battalion" },
+    { "id": "03rd_atac", "name": "3rd ATAC Battalion" },
+    { "id": "04th_tasc", "name": "4th TASC Brigade" },
+    { "id": "05th_tasc", "name": "5th TASC Brigade" },
+    { "id": "06th_tasc", "name": "6th TASC Brigade" },
+    { "id": "07th_logistics", "name": "7th Logistics Command" },
+    { "id": "08th_recon", "name": "8th Recon Group" },
+    { "id": "09th_signal", "name": "9th Signal Corps" },
+    { "id": "10th_engineering", "name": "10th Engineering Corps" },
+    { "id": "11th_military_police", "name": "11th Military Police" },
+    { "id": "12th_medical", "name": "12th Medical Corps" },
+    { "id": "13th_orbital_guard", "name": "13th Orbital Guard" },
+    { "id": "14th_airmobile", "name": "14th Airmobile Wing" },
+    { "id": "15th_special_forces", "name": "15th Special Forces" }
+  ]
+}

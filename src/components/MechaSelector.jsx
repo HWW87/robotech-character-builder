@@ -2,12 +2,24 @@ import React from "react";
 import RetroCard from "./RetroCard";
 import PropTypes from "prop-types";
 import mechaData from "../utils/mechaStats";
+import { getMechaRoleForOcc, normalizeFactionId, isSouthernCrossModule } from "../utils/southernCrossRules";
 
-export default function MechaSelector({ faction, mecha, onSelect }) {
+export default function MechaSelector({ faction, moduleId, occName, mecha, onSelect }) {
+  const normalizedFaction = normalizeFactionId(faction);
+
   // Filter mechas by faction (simple era-based mapping)
   const available = mechaData.mecha.filter((m) => {
-    if (faction === "RDF") return m.era === "Macross";
-    if (faction === "Southern Cross") return m.category === "destroid";
+    if (normalizedFaction === "rdf") return m.era === "Macross";
+
+    if (normalizedFaction === "southern_cross") {
+      if (isSouthernCrossModule(moduleId)) {
+        const role = getMechaRoleForOcc(occName);
+        if (role === "ATAC") return m.category === "veritech";
+        if (role === "TASC") return m.category === "destroid";
+      }
+      return true;
+    }
+
     return true;
   });
 
@@ -58,6 +70,8 @@ export default function MechaSelector({ faction, mecha, onSelect }) {
 
 MechaSelector.propTypes = {
   faction: PropTypes.string,
+  moduleId: PropTypes.string,
+  occName: PropTypes.string,
   mecha: PropTypes.string,
   onSelect: PropTypes.func.isRequired,
 };

@@ -6,9 +6,13 @@ import {
   getAllSkillNames,
 } from "../utils/occRules";
 
-export default function SkillManager({ faction, occ, skills, onChange }) {
+export default function SkillManager({ faction, occ, skills, blockedSkills = [], onChange }) {
   const [available, setAvailable] = useState([]);
   const [selected, setSelected] = useState(skills || []);
+
+  useEffect(() => {
+    setSelected(skills || []);
+  }, [skills]);
 
   useEffect(() => {
     // compute available list any time occupation or faction changes
@@ -23,9 +27,11 @@ export default function SkillManager({ faction, occ, skills, onChange }) {
   }, [faction, occ]);
 
   const limit = occ ? getOtherSkillLimit(occ) : Infinity;
+  const blockedSet = new Set(blockedSkills || []);
 
   const addSkill = (s) => {
     if (selected.includes(s)) return;
+    if (blockedSet.has(s)) return;
     if (selected.length >= limit) return; // prevent adding beyond limit
     const updated = [...selected, s];
     setSelected(updated);
@@ -40,7 +46,8 @@ export default function SkillManager({ faction, occ, skills, onChange }) {
 
   const autoFillSkills = () => {
     // Auto-seleccionar las primeras skills hasta el límite
-    const autoSelected = available.slice(0, Math.min(limit, available.length));
+    const filteredAvailable = available.filter((s) => !blockedSet.has(s));
+    const autoSelected = filteredAvailable.slice(0, Math.min(limit, filteredAvailable.length));
     setSelected(autoSelected);
     onChange(autoSelected);
   };
@@ -79,9 +86,9 @@ export default function SkillManager({ faction, occ, skills, onChange }) {
           <h3 className="font-semibold mb-2">Available Skills</h3>
           <ul className="h-64 overflow-y-auto border p-2 rounded">
             {available.map((s, i) => (
-              <li key={i} className="cursor-pointer hover:bg-retrogray p-1"
+              <li key={i} className={`p-1 ${blockedSet.has(s) ? "text-gray-400 cursor-not-allowed" : "cursor-pointer hover:bg-retrogray"}`}
                   onClick={() => addSkill(s)}>
-                {s}
+                {s} {blockedSet.has(s) ? "(locked by OCC/MOS)" : ""}
               </li>
             ))}
           </ul>
@@ -108,6 +115,7 @@ import PropTypes from "prop-types";
 SkillManager.propTypes = {
   faction: PropTypes.string,
   skills: PropTypes.array,
+  blockedSkills: PropTypes.array,
   onChange: PropTypes.func.isRequired,
 };
 

@@ -1,0 +1,50 @@
+{
+  "source": "Robotech RPG - Book 4 (Southern Cross)",
+  "occs": [
+    {
+      "id": "sc_atac_pilot",
+      "factions": ["southern_cross"],
+      "name_en": "ATAC Pilot",
+      "name_es": "Piloto ATAC",
+      "mecha_role": "ATAC",
+      "description_es": "Piloto de armaduras transformables de asalto táctico.",
+      "occ_skills": [
+        { "skill": "Pilot Jet", "bonus": 10 },
+        { "skill": "Weapon Systems", "bonus": 10 },
+        { "skill": "Read Sensory Instruments", "bonus": 10 },
+        { "skill": "Hand to Hand: Expert", "bonus": 0 }
+      ],
+      "other_skills": { "select_count": 8 }
+    },
+    {
+      "id": "sc_tasc_operator",
+      "factions": ["southern_cross"],
+      "name_en": "TASC Operator",
+      "name_es": "Operador TASC",
+      "mecha_role": "TASC",
+      "description_es": "Especialista en tanques y sistemas terrestres de apoyo táctico.",
+      "occ_skills": [
+        { "skill": "Pilot Automobile", "bonus": 15 },
+        { "skill": "Weapon Systems", "bonus": 10 },
+        { "skill": "Radio: Basic", "bonus": 5 },
+        { "skill": "Hand to Hand: Basic", "bonus": 0 }
+      ],
+      "other_skills": { "select_count": 10 }
+    },
+    {
+      "id": "sc_military_specialist",
+      "factions": ["southern_cross"],
+      "name_en": "Southern Cross Military Specialist",
+      "name_es": "Especialista Militar Southern Cross",
+      "mecha_role": "Any",
+      "description_es": "Perfil versátil para soporte técnico y operaciones especiales.",
+      "occ_skills": [
+        { "skill": "Computer Operation", "bonus": 10 },
+        { "skill": "Radio: Basic", "bonus": 10 },
+        { "skill": "Surveillance", "bonus": 5 },
+        { "skill": "W.P. Rifle", "bonus": 0 }
+      ],
+      "other_skills": { "select_count": 12 }
+    }
+  ]
+}

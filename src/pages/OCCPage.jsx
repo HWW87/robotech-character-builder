@@ -4,6 +4,7 @@ import { useCharacterData } from "../hooks/useCharacterData";
 import OCCSelector from "../components/OCCSelector";
 import { getOccDetails } from "../utils/occRules";
 import { validateOccAttributeRequirements } from "../domain/occ/occ";
+import { isSouthernCrossModule } from "../utils/southernCrossRules";
 
 export default function OCCPage() {
   const { character, update } = useCharacterData();
@@ -14,6 +15,7 @@ export default function OCCPage() {
   // Extract from new CharacterState structure (per PR#1)
   const faction = character.personal?.faction || "";
   const occName = character.occ?.occName || "";
+  const moduleId = character.moduleId || "macross_book1";
   const attributes = character.attributes || {};
 
   const handleSelect = (val) => {
@@ -63,6 +65,10 @@ export default function OCCPage() {
   const handleNext = () => {
     if (!occName) {
       setError("Occupation must be selected");
+      return;
+    }
+    if (isSouthernCrossModule(moduleId)) {
+      navigate("/mos");
       return;
     }
     navigate("/skills");
@@ -129,7 +135,7 @@ export default function OCCPage() {
               <strong>Pre‑paid skills:</strong>
               <ul className="list-disc list-inside">
                 {selectedDetails.occ_skills.map((s, idx) => (
-                  <li key={idx}>{s.skill}</li>
+                  <li key={idx}>{s.skill || s.name || s}</li>
                 ))}
               </ul>
             </>
