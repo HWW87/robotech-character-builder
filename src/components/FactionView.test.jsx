@@ -11,6 +11,6 @@ describe('FactionView', () => {
     const rdfCard = screen.getByText(/RDF - Robotech/);
     expect(rdfCard).toBeTruthy();
     fireEvent.click(rdfCard);
-    expect(handle).toHaveBeenCalledWith('RDF');
+    expect(handle).toHaveBeenCalledWith('rdf');
   });
 });
