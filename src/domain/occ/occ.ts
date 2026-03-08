@@ -26,6 +26,10 @@ export interface AttributeValidationResult {
   readonly warnings: string[]; // preferred attributes not met
 }
 
+interface LegacyOccAttributeShape {
+  attribute_requirements?: AttributeRequirements;
+}
+
 /**
  * Definición de una Occupational Character Class
  * Immutable, representa la OCC como está definida en occ_rdf.json
@@ -59,19 +63,28 @@ export type OccSkillBonuses = Record<SkillId, number>;
  * @returns Resultado de validación con detalles de requisitos no cumplidos
  */
 export function validateOccAttributeRequirements(
-  occ: OCC,
+  occ: OCC | LegacyOccAttributeShape,
   characterAttributes: Record<string, number>
 ): AttributeValidationResult {
   const unmetMinimums: Array<{ attribute: string; required: number; actual: number }> = [];
   const warnings: string[] = [];
+  const requirements = (occ as OCC).attributeRequirements || (occ as LegacyOccAttributeShape).attribute_requirements;
+
+  const normalizeAttributeName = (raw: string): string => {
+    const cleaned = raw.replace(/[^a-zA-Z]/g, '').toUpperCase();
+    if (cleaned === 'SPEED') return 'Spd';
+    if (cleaned.length <= 3) return cleaned;
+    return raw;
+  };
 
   // Validar minimums requeridos
-  if (occ.attributeRequirements?.minimums) {
-    for (const [attr, minValue] of Object.entries(occ.attributeRequirements.minimums)) {
-      const actualValue = characterAttributes[attr] || 0;
+  if (requirements?.minimums) {
+    for (const [attr, minValue] of Object.entries(requirements.minimums)) {
+      const normalizedAttr = normalizeAttributeName(attr);
+      const actualValue = characterAttributes[normalizedAttr] || 0;
       if (actualValue < minValue) {
         unmetMinimums.push({
-          attribute: attr,
+          attribute: normalizedAttr,
           required: minValue,
           actual: actualValue,
         });
@@ -80,8 +93,28 @@ export function validateOccAttributeRequirements(
   }
 
   // Advertencias para preferred attributes (no bloqueantes)
-  if (occ.attributeRequirements?.preferred) {
-    warnings.push(...occ.attributeRequirements.preferred);
+  // Si se puede parsear "P.P. 9+", solo advertir cuando no se cumple.
+  if (requirements?.preferred) {
+    for (const preferredText of requirements.preferred) {
+      const thresholdMatch = preferredText.match(/([A-Za-z.]+)\s*(\d+)\+/);
+      if (!thresholdMatch) {
+        warnings.push(preferredText);
+        continue;
+      }
+
+      const [, rawAttr, rawThreshold] = thresholdMatch;
+      if (!rawAttr || !rawThreshold) {
+        warnings.push(preferredText);
+        continue;
+      }
+      const normalizedAttr = normalizeAttributeName(rawAttr);
+      const threshold = Number(rawThreshold);
+      const actualValue = characterAttributes[normalizedAttr] || 0;
+
+      if (actualValue < threshold) {
+        warnings.push(`${normalizedAttr}: preferred ${threshold}+ (you have ${actualValue})`);
+      }
+    }
   }
 
   return {

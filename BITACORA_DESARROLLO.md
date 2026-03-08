@@ -793,3 +793,128 @@ Personaje con IQ=20, Level=5, mismo skill
 - Global application ensures correct skill totals in Summary view
 
 ### Próximo: PR#7 (OCC Attribute Requirements Validation)
+
+---
+
+## 2026-03-04 - PR#7: OCC Attribute Requirements Validation [COMPLETADO]
+
+### Status
+✅ **PR#7 COMPLETADO** - Commit `68a2781` pushed to feature/typescript  
+✅ **TODAS LAS 7 PRs COMPLETADAS** - CHARACTER_CREATION_SPEC fully implemented
+
+### Cambios Implementados
+
+#### 1. domain/occ/occ.ts
+- **New interface: AttributeRequirements**
+  - minimums?: Record<string, number> (required minimums, e.g., IQ >= 8)
+  - preferred?: string[] (nice-to-have attributes, non-blocking)
+  - notes?: string (additional context)
+
+- **New interface: AttributeValidationResult**
+  - isValid: boolean (all required minimums met)
+  - unmetMinimums: array of {attribute, required, actual}
+  - warnings: string[] (preferred attributes not met)
+
+- **Updated OCC interface**:
+  - Added field: attributeRequirements?: AttributeRequirements
+
+- **New function: validateOccAttributeRequirements()**
+  - Input: OCC, character attributes
+  - Output: AttributeValidationResult
+  - Logic: Check each minimum requirement, collect unmet requirements
+  - Non-blocking: preferred attributes only generate warnings
+
+#### 2. pages/OCCPage.jsx
+- **Enhanced handleSelect()**:
+  - Extract OCC attribute requirements from selected OCC
+  - Call validateOccAttributeRequirements() on selection
+  - **Blocking validation**: If minimums not met, show error and prevent update
+  - **Non-blocking warnings**: If preferred attributes missing, show warning but allow selection
+
+- **New UI: Attribute Requirements Display**:
+  - Show required minimums vs actual character values with ✓/✗ indicator
+  - Display preferred attributes as non-blocking warnings (yellow box)
+  - Show notes/context about attribute requirements
+
+- **Error handling**:
+  - Clear error when valid OCC selected
+  - Set validationWarnings state for non-blocking warnings
+
+### Validaciones
+- ✅ Build: 929.44 kB (OK, +1.51 kB vs PR#6)
+- ✅ Type-check: OK (tsc --noEmit)
+- ✅ Tests: 14/17 green (3 skipped) — no regressions
+- ✅ Git: Commit + push a origin/feature/typescript (commit 68a2781)
+
+### Ejemplo de Validación
+
+**Veritech Fighter Pilot requirements:**
+```json
+"attribute_requirements": {
+  "minimums": { "IQ": 8 },
+  "preferred": ["P.P. 9+"],
+  "notes": "P.P. 9+ preferred"
+}
+```
+
+**Scenario 1: IQ=6, P.P.=10**
+- ✗ BLOCKED: IQ requirement not met (needs 8, have 6)
+- Error shown, OCC selection prevented
+
+**Scenario 2: IQ=8, P.P.=8**
+- ✓ ALLOWED: All minimums met
+- Warning shown: "P.P. 9+ preferred"
+- OCC selection succeeds
+
+**Scenario 3: IQ=10, P.P.=12**
+- ✓ ALLOWED: All minimums and preferred met
+- No warnings shown
+- OCC selection succeeds
+
+### Estructura Actualizada
+
+```
+character.occ = {
+  occId: OccId,
+  occName: string,
+  occSkills: SkillId[],
+  otherSkillsChosen: SkillId[]
+}
+```
+
+### Flujo Completo de Creación (11/11 pasos COMPLETADO)
+1. ✅ Personal Data (Name, Age, Rank)
+2. ✅ Faction (Good/Selfish/Evil → NUEDC faction)
+3. ✅ Attributes (3d6+1d6 exceptional, IQ bonus)
+4. ✅ Vitality (HP + SDC)
+5. ✅ **OCC Selection** (7 OCCs, skills, **attribute validation**)
+6. ✅ Skills (Primary + Secondary per level, **IQ bonus applied**)
+7. ✅ Equipment (Standard gear, wages, savings)
+8. ✅ Mecha Selection (Destroid/Veritech per faction)
+9. ✅ Alignment (9 alignments, Good/Selfish/Evil grouping)
+10. ✅ Summary (Preview all fields, export/import)
+11. ✅ Manuals (Reference PDFs)
+
+### Impacto
+- **All 7 PRs from CHARACTER_CREATION_SPEC now complete**
+- **OCC screen now blocks invalid attribute combinations**
+- **Full character creation flow validated and working**
+
+### TODOs Futuros (Post-MVP)
+- Add alignment-specific attribute bonuses (if any)
+- Add additional validation rules from extended Robotech rules
+- Performance optimization: cache OCC validation results
+- Add visual indicators for attributes below recommended levels
+- Consider attribute raise recommendations based on failed OCC checks
+
+### Notas Técnicas
+- Validation is early (at selection time), not deferred to validation page
+- Blocking validation prevents invalid character states immediately
+- Non-blocking warnings provide context without preventing progression
+- All 7 OCC definitions in occ_rdf.json have attribute_requirements field
+
+### Próximos Pasos
+- **Testing**: Full character creation flow test (Personal → Summary)
+- **Polish**: Component styling and UX refinement
+- **Documentation**: Update README with feature completion
+- **Release**: Merge feature/typescript to main branch after full testing

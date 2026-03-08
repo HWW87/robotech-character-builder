@@ -18,6 +18,7 @@ export default function OCCPage() {
 
   const handleSelect = (val) => {
     setError(val ? "" : "Occupation must be selected");
+    setValidationWarnings([]);
     
     if (val) {
       // PR#7: Validate attribute requirements when OCC is selected
@@ -34,6 +35,7 @@ export default function OCCPage() {
             .map(u => `${u.attribute}: needs ${u.required}, have ${u.actual}`)
             .join("; ");
           setError(`Attribute requirements not met: ${unmet}`);
+          setValidationWarnings([]);
           return;
         }
         
