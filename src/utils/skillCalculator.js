@@ -50,18 +50,40 @@ export function calculateSkills(
   iqBonusPercent = undefined // IQ bonus as percentage if IQ >= 17
 ) {
   const allSkills = [];
+
+  const addMissingSkill = (nameOrId, bonus = 0, isSecondary = false, reason = "Missing in catalog") => {
+    allSkills.push({
+      skillId: null,
+      id: null,
+      name: nameOrId,
+      name_es: nameOrId,
+      name_en: nameOrId,
+      base: null,
+      bonus,
+      iqBonus: 0,
+      perLevel: undefined,
+      perLevelBonus: 0,
+      total: null,
+      type: isSecondary ? "Secondary" : "OCC",
+      missingInCatalog: true,
+      missingReason: reason,
+    });
+  };
+
   const addSkill = (nameOrId, bonus = 0, isSecondary = false) => {
     // Intentar resolver el ID
     const skillId = resolveSkillId(nameOrId);
     
     if (!skillId) {
-      console.warn(`⚠️ No se pudo resolver skill: ${nameOrId}`);
+      console.warn(`⚠️ Missing in catalog: ${nameOrId}`);
+      addMissingSkill(nameOrId, bonus, isSecondary, "Missing in catalog");
       return;
     }
 
     const skill = getSkillById(skillId);
     if (!skill) {
-      console.warn(`⚠️ Skill no encontrado después de resolver ID: ${skillId}`);
+      console.warn(`⚠️ Missing in catalog by id: ${skillId}`);
+      addMissingSkill(nameOrId, bonus, isSecondary, "Missing in catalog");
       return;
     }
 
@@ -72,6 +94,8 @@ export function calculateSkills(
     // Usar los datos de dominio en lugar del JSON legacy
     const base = skill.base || 0;
     const perLevel = skill.perLevel || 0;
+    const legacySkill = getSkillEntry(nameOrId);
+    const hasPerLevelTerm = legacySkill?.per_level !== null && typeof legacySkill?.per_level !== "undefined";
 
     // FIX A: Todas las skills avanzan por nivel (incluyendo secondary)
     const perLevelBonus = perLevel * Math.max(0, level - 1);
@@ -95,6 +119,7 @@ export function calculateSkills(
       iqBonus,
       perLevel,
       perLevelBonus,
+      hasPerLevelTerm,
       total,
       type: isSecondary ? "Secondary" : "OCC"
     });

@@ -16,6 +16,20 @@ export default function SummaryView({
   onImport,
   onReset,
 }) {
+  const levelDelta = Math.max(0, (level || 1) - 1);
+
+  const formatBreakdown = (skill, baseWithoutExtra) => {
+    if (skill.missingInCatalog) {
+      return "Missing in catalog";
+    }
+
+    const parts = [`base ${skill.base}`, `${baseWithoutExtra}`];
+    if (skill.hasPerLevelTerm !== false && typeof skill.perLevel !== "undefined" && skill.perLevel !== null) {
+      parts.push(`lvl${levelDelta}*${skill.perLevel}`);
+    }
+    return `(${parts.join(" + ")})`;
+  };
+
   return (
     <div className="p-6">
       <RetroCard title="Character Summary">
@@ -57,12 +71,17 @@ export default function SummaryView({
                   >
                     <span>
                       {s.name} ({s.type})
+                      {s.missingInCatalog && (
+                        <span className="ml-2 text-xs text-red-600 font-semibold">
+                          Missing in catalog
+                        </span>
+                      )}
                     </span>
                     <span className="flex items-center gap-2">
                       <span>
-                        {s.total}%{" "}
+                        {s.total !== null && typeof s.total !== "undefined" ? `${s.total}%` : "—"}{" "}
                         <span className="text-xs text-gray-400">
-                          (base {s.base} + {baseWithoutExtra} + lvl×{s.perLevel})
+                          {formatBreakdown(s, baseWithoutExtra)}
                         </span>
                       </span>
                       <input
