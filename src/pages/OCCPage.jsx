@@ -48,11 +48,15 @@ export default function OCCPage() {
       }
     }
     
-    // Update entire occ object with new occName
+    // Update entire occ object with new occName and occSkills
+    const selectedOcc = getOccDetails(val);
+    const occSkills = selectedOcc?.occ_skills || [];
+    
     update("occ", {
       ...character.occ,
       occName: val,
       occId: val, // TODO: map to proper occId from repository
+      occSkills: occSkills,
     });
   };
 
