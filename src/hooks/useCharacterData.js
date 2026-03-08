@@ -10,6 +10,7 @@ const DEFAULT_CHARACTER_STATE = {
     age: undefined,
     rank: undefined,
     faction: "",
+    photoBase64: "", // Character portrait as base64 data URL
   },
   level: {
     currentLevel: 1,

@@ -1,6 +1,7 @@
 import React from "react";
 import RetroCard from "./RetroCard";
 import { getFactionById } from "../data/factions";
+import portraitPlaceholder from "../assets/portrait_placeholder.png";
 
 /**
  * Componente presentacional puro para mostrar resumen de personaje.
@@ -18,6 +19,42 @@ export default function SummaryView({
   onReset,
 }) {
   const levelDelta = Math.max(0, (level || 1) - 1);
+
+  // Helper to get initials from name for fallback portrait
+  const getInitials = (name) => {
+    if (!name || name === "—") return "??";
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .filter(Boolean)
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  };
+
+  // Get portrait: prioritize photoBase64, fallback to photo, then placeholder
+  const getPortraitSrc = () => {
+    const photoBase64 = character.personal?.photoBase64;
+    const photo = character.personal?.photo;
+    
+    if (photoBase64 && photoBase64.startsWith("data:image")) {
+      return photoBase64;
+    }
+    if (photo && photo.startsWith("data:image")) {
+      return photo;
+    }
+    return portraitPlaceholder;
+  };
+
+  // Check if we have a real portrait or should show initials
+  const hasRealPortrait = () => {
+    const photoBase64 = character.personal?.photoBase64;
+    const photo = character.personal?.photo;
+    return (
+      (photoBase64 && photoBase64.startsWith("data:image")) ||
+      (photo && photo.startsWith("data:image"))
+    );
+  };
 
   const formatBreakdown = (skill, baseWithoutExtra) => {
     if (skill.missingInCatalog) {
@@ -40,39 +77,81 @@ export default function SummaryView({
     <div className="p-6">
       <RetroCard title="Character Summary">
         <div className="bg-white p-6 rounded-xl shadow-lg text-sm">
-          <div className="grid grid-cols-2 mb-4">
-            <div>
-              <p>
-                <strong>Name:</strong> {character.personal?.name || "—"}
-              </p>
-              <div className="flex items-center gap-2 mb-2">
-                <div>
-                  <strong>Faction:</strong>
-                  {character.personal?.faction ? (
-                    <>
-                      {" "}
-                      {getFactionById(character.personal.faction)?.name || "—"}
-                    </>
-                  ) : (
-                    " —"
-                  )}
-                </div>
-                {character.personal?.faction && getFactionById(character.personal.faction) && (
+          {/* Character Sheet Header: Portrait + Info + Faction Emblem */}
+          <div className="flex items-start gap-4 mb-6 pb-4 border-b-2 border-gray-300">
+            {/* Left: Character Portrait */}
+            <div className="flex-shrink-0">
+              <div className="relative w-20 h-20 rounded-lg border-2 border-gray-400 overflow-hidden bg-gray-100">
+                {hasRealPortrait() ? (
                   <img
-                    src={getFactionById(character.personal.faction)?.image}
-                    alt={getFactionById(character.personal.faction)?.name}
-                    className="w-12 h-12 rounded object-cover border border-gray-300"
+                    src={getPortraitSrc()}
+                    alt={`${character.personal?.name || "Character"} portrait`}
+                    className="w-full h-full object-cover"
                   />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300 text-gray-600 font-bold text-xl">
+                    {getInitials(character.personal?.name)}
+                  </div>
                 )}
               </div>
+            </div>
+
+            {/* Middle: Character Info */}
+            <div className="flex-grow">
+              <h2 className="text-lg font-bold mb-1">
+                {character.personal?.name || "Unnamed Character"}
+              </h2>
+              <div className="grid grid-cols-2 gap-x-4 text-xs">
+                <div>
+                  <p>
+                    <strong>Level:</strong> {level || 1}
+                  </p>
+                  <p>
+                    <strong>O.C.C.:</strong> {character.occ?.occName || "—"}
+                  </p>
+                </div>
+                <div>
+                  <p>
+                    <strong>Alignment:</strong> {character.alignment || "—"}
+                  </p>
+                  <p>
+                    <strong>Faction:</strong>{" "}
+                    {character.personal?.faction
+                      ? getFactionById(character.personal.faction)?.name || "—"
+                      : "—"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Faction Emblem */}
+            {character.personal?.faction &&
+              getFactionById(character.personal.faction) && (
+                <div className="flex-shrink-0">
+                  <div className="w-10 h-10 rounded border-2 border-gray-400 overflow-hidden bg-white p-1">
+                    <img
+                      src={getFactionById(character.personal.faction)?.image}
+                      alt={`${
+                        getFactionById(character.personal.faction)?.name
+                      } emblem`}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                </div>
+              )}
+          </div>
+
+          {/* Previous character details section - now secondary */}
+          <div className="grid grid-cols-2 mb-4 text-xs">
+            <div>
               <p>
-                <strong>O.C.C.:</strong> {character.occ?.occName || "—"}
+                <strong>Age:</strong> {character.personal?.age || "—"}
+              </p>
+              <p>
+                <strong>Rank:</strong> {character.personal?.rank || "—"}
               </p>
             </div>
             <div>
-              <p>
-                <strong>Level:</strong> {level}
-              </p>
               <p>
                 <strong>Mecha:</strong> {character.mecha?.mechaName || "—"}
               </p>
